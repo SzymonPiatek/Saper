@@ -15,6 +15,11 @@ class Window:
         self.master.geometry("1024x720+0+0")
         self.master.bind("<Escape>", self.confirm_exit)
 
+        # Font settings
+        self.font_family = "Arial"
+        self.main_font = ctk.CTkFont(family=self.font_family, size=32)
+        self.smaller_font = ctk.CTkFont(family=self.font_family, size=28)
+
         # DB and Session
         self.db = Database()
         self.db.initialize_database()
@@ -31,6 +36,10 @@ class Window:
         # Login menu
         self.login_menu()
 
+    def set_font(self, frame):
+        for widget in frame.winfo_children():
+            widget.configure(font=self.main_font)
+
     def confirm_exit(self, event=None):
         if messagebox.askyesno("Wyjście", "Czy na pewno chcesz wyjść z gry?"):
             self.master.destroy()
@@ -45,22 +54,29 @@ class Window:
         self.login_menu_frame.pack(fill=tk.BOTH, expand=True)
 
         # Login Widgets
+        register_label = ctk.CTkLabel(master=self.login_menu_frame, text="Nie masz konta?")
         register_button = ctk.CTkButton(master=self.login_menu_frame, text="Stwórz konto",
                                         command=lambda: self.change_frame(self.login_menu_frame,
                                                                           self.register_menu))
         login_label = ctk.CTkLabel(master=self.login_menu_frame, text="Login")
-        self.login_entry = ctk.CTkEntry(master=self.login_menu_frame)
+        self.login_entry = ctk.CTkEntry(master=self.login_menu_frame, corner_radius=20)
         password_label = ctk.CTkLabel(master=self.login_menu_frame, text="Hasło")
-        self.password_entry = ctk.CTkEntry(master=self.login_menu_frame, show="*")
-        submit_button = ctk.CTkButton(master=self.login_menu_frame, text="Zaloguj się", command=self.login_submit)
+        self.password_entry = ctk.CTkEntry(master=self.login_menu_frame, show="*", corner_radius=20)
+        submit_button = ctk.CTkButton(master=self.login_menu_frame, text="Zaloguj się",
+                                      command=self.login_submit, corner_radius=20)
+
+        # Configure Widgets
+        self.set_font(frame=self.login_menu_frame)
+        register_label.configure(font=self.smaller_font)
 
         # Login Widgets Placing
-        login_label.place(relx=0.5, rely=0.35, relwidth=0.25, anchor="center")
-        self.login_entry.place(relx=0.5, rely=0.4, relwidth=0.25, anchor="center")
-        password_label.place(relx=0.5, rely=0.5, relwidth=0.25, anchor="center")
-        self.password_entry.place(relx=0.5, rely=0.55, relwidth=0.25, anchor="center")
-        submit_button.place(relx=0.5, rely=0.7, relwidth=0.2, anchor="center")
-        register_button.place(relx=0.5, rely=0.9, relwidth=0.2, anchor="center")
+        login_label.place(relx=0.5, rely=0.25, anchor="center")
+        self.login_entry.place(relx=0.5, rely=0.32, relwidth=0.4, anchor="center")
+        password_label.place(relx=0.5, rely=0.4, anchor="center")
+        self.password_entry.place(relx=0.5, rely=0.47, relwidth=0.4, anchor="center")
+        submit_button.place(relx=0.5, rely=0.6, relwidth=0.4, anchor="center")
+        register_label.place(relx=0.5, rely=0.8, anchor="center")
+        register_button.place(relx=0.5, rely=0.9, relwidth=0.3, anchor="center")
 
     def register_menu(self):
         # Login Frame
@@ -68,21 +84,27 @@ class Window:
         self.login_menu_frame.pack(fill=tk.BOTH, expand=True)
 
         # Login Widgets
+        login_ask_label = ctk.CTkLabel(master=self.login_menu_frame, text="Masz już konto?")
         login_button = ctk.CTkButton(master=self.login_menu_frame, text="Zaloguj się",
                                      command=lambda: self.change_frame(self.login_menu_frame,
                                                                        self.login_menu))
         login_label = ctk.CTkLabel(master=self.login_menu_frame, text="Login")
-        self.login_entry = ctk.CTkEntry(master=self.login_menu_frame)
+        self.login_entry = ctk.CTkEntry(master=self.login_menu_frame, corner_radius=20)
         password_label = ctk.CTkLabel(master=self.login_menu_frame, text="Hasło")
-        self.password_entry = ctk.CTkEntry(master=self.login_menu_frame, show="*")
-        submit_button = ctk.CTkButton(master=self.login_menu_frame, text="Stwórz konto", command=self.create_user)
+        self.password_entry = ctk.CTkEntry(master=self.login_menu_frame, show="*", corner_radius=20)
+        submit_button = ctk.CTkButton(master=self.login_menu_frame, text="Zarejestruj się",
+                                      command=self.create_user, corner_radius=20)
+
+        # Configure Widgets
+        self.set_font(frame=self.login_menu_frame)
 
         # Login Widgets Placing
-        login_label.place(relx=0.5, rely=0.35, relwidth=0.25, anchor="center")
-        self.login_entry.place(relx=0.5, rely=0.4, relwidth=0.25, anchor="center")
-        password_label.place(relx=0.5, rely=0.5, relwidth=0.25, anchor="center")
-        self.password_entry.place(relx=0.5, rely=0.55, relwidth=0.25, anchor="center")
-        submit_button.place(relx=0.5, rely=0.7, relwidth=0.2, anchor="center")
+        login_label.place(relx=0.5, rely=0.25, anchor="center")
+        self.login_entry.place(relx=0.5, rely=0.32, relwidth=0.4, anchor="center")
+        password_label.place(relx=0.5, rely=0.4, anchor="center")
+        self.password_entry.place(relx=0.5, rely=0.47, relwidth=0.4, anchor="center")
+        submit_button.place(relx=0.5, rely=0.6, relwidth=0.4, anchor="center")
+        login_ask_label.place(relx=0.5, rely=0.8, anchor="center")
         login_button.place(relx=0.5, rely=0.9, relwidth=0.2, anchor="center")
 
     def create_user(self):
@@ -126,6 +148,9 @@ class Window:
         exit_button = ctk.CTkButton(self.main_menu_frame, text="Wyjście", corner_radius=20,
                                     command=self.confirm_exit)
         login_label = ctk.CTkLabel(self.main_menu_frame, text=self.session.get_username())
+
+        # Configure Widgets
+        self.set_font(frame=self.main_menu_frame)
 
         # Main Menu Widgets Placing
         login_label.place(relx=0.99, anchor="ne")
