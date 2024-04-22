@@ -122,7 +122,7 @@ class Window:
 
     def login_user(self, user):
         self.session.login(user)
-        print(f"Zalogowano jako: {self.session.get_username()}")
+        print(f"Zalogowano jako: {self.session.user_username}")
         self.change_frame(old=self.login_menu_frame, new_func=self.main_menu)
 
     def login_submit(self):
@@ -148,7 +148,7 @@ class Window:
         scoreboard_button = ctk.CTkButton(self.main_menu_frame, text="Sala chwały", corner_radius=20)
         exit_button = ctk.CTkButton(self.main_menu_frame, text="Wyjście", corner_radius=20,
                                     command=self.confirm_exit)
-        login_label = ctk.CTkLabel(self.main_menu_frame, text=self.session.get_username())
+        login_label = ctk.CTkLabel(self.main_menu_frame, text=self.session.user_username)
 
         # Configure Widgets
         self.set_font(frame=self.main_menu_frame)
