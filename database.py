@@ -49,6 +49,7 @@ def create_user(username, password):
         )
         conn.commit()
         print(f"Utworzono użytkownika {username}")
+        return check_user(username=username, password=password)
     except sqlite3.Error as e:
         print(e)
     finally:
