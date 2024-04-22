@@ -13,6 +13,7 @@ class Window:
         self.master = master
         self.master.title("Saper")
         self.master.geometry("1024x720+0+0")
+        self.master.resizable(False, False)
         self.master.bind("<Escape>", self.confirm_exit)
 
         # Font settings
