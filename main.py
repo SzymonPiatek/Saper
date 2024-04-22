@@ -6,15 +6,38 @@ import random
 import database
 
 
+class Session:
+    def __init__(self):
+        self.logged_in = False
+        self.user = None
+        self.user_username = None
+
+    def login(self, username):
+        self.user = username
+        self.user_username = self.user[1]
+        self.logged_in = True
+
+    def logout(self):
+        self.user = None
+        self.logged_in = False
+
+    def is_logged_in(self):
+        return self.logged_in
+
+    def get_username(self):
+        return self.user_username
+
+
 class Window:
     def __init__(self, master):
         self.master = master
         self.master.title("Saper")
         self.master.geometry("1024x720+0+0")
+        self.master.bind("<Escape>", self.confirm_exit)
 
         database.main()
+        self.session = Session()
 
-        self.master.bind("<Escape>", self.confirm_exit)
 
         self.ratio = 1024 / 720
 
@@ -102,7 +125,11 @@ class Window:
             print("Taki użytkownik już istnieje")
         else:
             user = database.create_user(username=username, password=password)
-            print(user)
+            self.login_user(user=user)
+
+    def login_user(self, user):
+        self.session.login(user)
+        print(f"Zalogowano jako: {self.session.get_username()}")
 
     def login_submit(self):
         username = self.login_entry.get()
@@ -111,7 +138,7 @@ class Window:
         user_exist = database.check_user(username=username, password=password)
 
         if user_exist:
-            print("istnieje")
+            self.login_user(user=user_exist)
         else:
             print("nie istnieje")
 
