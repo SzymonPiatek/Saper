@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 import time
 import random
+import database
 
 
 class Window:
@@ -12,11 +13,14 @@ class Window:
         # self.master.attributes("-fullscreen", True)
         self.master.geometry("1024x720+0+0")
 
+        database.main()
+
         self.master.bind("<Escape>", self.confirm_exit)
 
-        screen_width = self.master.winfo_screenwidth()
-        screen_height = self.master.winfo_screenheight()
-        self.ratio = screen_width / screen_height
+        # screen_width = self.master.winfo_screenwidth()
+        # screen_height = self.master.winfo_screenheight()
+        # self.ratio = screen_width / screen_height
+        self.ratio = 16 / 9
 
         self.disabled_buttons = set()
 
@@ -25,6 +29,7 @@ class Window:
 
 
         self.login_menu()
+        # self.main_menu()
 
     def confirm_exit(self, event=None):
         if messagebox.askyesno("Wyjście", "Czy na pewno chcesz wyjść z gry?"):
@@ -39,18 +44,29 @@ class Window:
         self.login_menu_frame.pack(fill=tk.BOTH, expand=True)
 
         login_label = ctk.CTkLabel(master=self.login_menu_frame, text="Login")
-        login_entry = ctk.CTkEntry(master=self.login_menu_frame)
+        self.login_entry = ctk.CTkEntry(master=self.login_menu_frame)
 
         password_label = ctk.CTkLabel(master=self.login_menu_frame, text="Hasło")
-        password_entry = ctk.CTkEntry(master=self.login_menu_frame, show="*")
+        self.password_entry = ctk.CTkEntry(master=self.login_menu_frame, show="*")
 
-        submit_button = ctk.CTkButton(master=self.login_menu_frame, text="Zaloguj się")
+        submit_button = ctk.CTkButton(master=self.login_menu_frame, text="Zaloguj się", command=self.login_submit)
 
         login_label.place(relx=0.5, rely=0.35, relwidth=0.25, anchor="center")
-        login_entry.place(relx=0.5, rely=0.4, relwidth=0.25, anchor="center")
+        self.login_entry.place(relx=0.5, rely=0.4, relwidth=0.25, anchor="center")
         password_label.place(relx=0.5, rely=0.5, relwidth=0.25, anchor="center")
-        password_entry.place(relx=0.5, rely=0.55, relwidth=0.25, anchor="center")
+        self.password_entry.place(relx=0.5, rely=0.55, relwidth=0.25, anchor="center")
         submit_button.place(relx=0.5, rely=0.7, relwidth=0.2, anchor="center")
+
+    def login_submit(self):
+        username = self.login_entry.get()
+        password = self.password_entry.get()
+
+        user_exist = database.check_user(username=username, password=password)
+
+        if user_exist:
+            print("istnieje")
+        else:
+            print("nie istnieje")
 
     def main_menu(self):
         self.main_menu_frame = ctk.CTkFrame(self.main_frame)
