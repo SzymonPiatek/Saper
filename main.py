@@ -3,57 +3,32 @@ import tkinter as tk
 from tkinter import messagebox
 import time
 import random
-import database
-
-
-class Session:
-    def __init__(self):
-        self.logged_in = False
-        self.user = None
-        self.user_id = None
-        self.user_username = None
-
-    def login(self, username):
-        self.logged_in = True
-        self.user = username
-        self.user_id = self.user[0]
-        self.user_username = self.user[1]
-
-    def logout(self):
-        self.logged_in = False
-        self.user = None
-        self.user_id = None
-        self.user_username = None
-
-    def is_logged_in(self):
-        return self.logged_in
-
-    def get_user_id(self):
-        return self.user_id
-
-    def get_username(self):
-        return self.user_username
+from database import Database
+from session import Session
 
 
 class Window:
     def __init__(self, master):
+        # Master settings
         self.master = master
         self.master.title("Saper")
         self.master.geometry("1024x720+0+0")
         self.master.bind("<Escape>", self.confirm_exit)
 
-        database.main()
+        # DB and Session
+        self.db = Database()
+        self.db.initialize_database()
         self.session = Session()
 
-
+        # Game settings
         self.ratio = 1024 / 720
-
         self.disabled_buttons = set()
 
+        # Main Frame
         self.main_frame = ctk.CTkFrame(self.master)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-
+        # Login menu
         self.login_menu()
 
     def confirm_exit(self, event=None):
@@ -65,27 +40,21 @@ class Window:
         new_func()
 
     def login_menu(self):
+        # Login Frame
         self.login_menu_frame = ctk.CTkFrame(self.main_frame)
         self.login_menu_frame.pack(fill=tk.BOTH, expand=True)
 
-        register_button = ctk.CTkButton(master=self.login_menu_frame,
-                                        text="Stwórz konto",
+        # Login Widgets
+        register_button = ctk.CTkButton(master=self.login_menu_frame, text="Stwórz konto",
                                         command=lambda: self.change_frame(self.login_menu_frame,
                                                                           self.register_menu))
-
-        login_label = ctk.CTkLabel(master=self.login_menu_frame,
-                                   text="Login")
+        login_label = ctk.CTkLabel(master=self.login_menu_frame, text="Login")
         self.login_entry = ctk.CTkEntry(master=self.login_menu_frame)
+        password_label = ctk.CTkLabel(master=self.login_menu_frame, text="Hasło")
+        self.password_entry = ctk.CTkEntry(master=self.login_menu_frame, show="*")
+        submit_button = ctk.CTkButton(master=self.login_menu_frame, text="Zaloguj się", command=self.login_submit)
 
-        password_label = ctk.CTkLabel(master=self.login_menu_frame,
-                                      text="Hasło")
-        self.password_entry = ctk.CTkEntry(master=self.login_menu_frame,
-                                           show="*")
-
-        submit_button = ctk.CTkButton(master=self.login_menu_frame,
-                                      text="Zaloguj się",
-                                      command=self.login_submit)
-
+        # Login Widgets Placing
         login_label.place(relx=0.5, rely=0.35, relwidth=0.25, anchor="center")
         self.login_entry.place(relx=0.5, rely=0.4, relwidth=0.25, anchor="center")
         password_label.place(relx=0.5, rely=0.5, relwidth=0.25, anchor="center")
@@ -94,27 +63,21 @@ class Window:
         register_button.place(relx=0.5, rely=0.9, relwidth=0.2, anchor="center")
 
     def register_menu(self):
+        # Login Frame
         self.login_menu_frame = ctk.CTkFrame(self.main_frame)
         self.login_menu_frame.pack(fill=tk.BOTH, expand=True)
 
-        login_button = ctk.CTkButton(master=self.login_menu_frame,
-                                     text="Zaloguj się",
+        # Login Widgets
+        login_button = ctk.CTkButton(master=self.login_menu_frame, text="Zaloguj się",
                                      command=lambda: self.change_frame(self.login_menu_frame,
                                                                        self.login_menu))
-
-        login_label = ctk.CTkLabel(master=self.login_menu_frame,
-                                   text="Login")
+        login_label = ctk.CTkLabel(master=self.login_menu_frame, text="Login")
         self.login_entry = ctk.CTkEntry(master=self.login_menu_frame)
+        password_label = ctk.CTkLabel(master=self.login_menu_frame, text="Hasło")
+        self.password_entry = ctk.CTkEntry(master=self.login_menu_frame, show="*")
+        submit_button = ctk.CTkButton(master=self.login_menu_frame, text="Stwórz konto", command=self.create_user)
 
-        password_label = ctk.CTkLabel(master=self.login_menu_frame,
-                                      text="Hasło")
-        self.password_entry = ctk.CTkEntry(master=self.login_menu_frame,
-                                           show="*")
-
-        submit_button = ctk.CTkButton(master=self.login_menu_frame,
-                                      text="Stwórz konto",
-                                      command=self.create_user)
-
+        # Login Widgets Placing
         login_label.place(relx=0.5, rely=0.35, relwidth=0.25, anchor="center")
         self.login_entry.place(relx=0.5, rely=0.4, relwidth=0.25, anchor="center")
         password_label.place(relx=0.5, rely=0.5, relwidth=0.25, anchor="center")
@@ -126,12 +89,12 @@ class Window:
         username = self.login_entry.get()
         password = self.password_entry.get()
 
-        user_exist = database.check_user(username=username, password=password)
+        user_exist = self.db.check_user(username=username, password=password)
 
         if user_exist:
             print("Taki użytkownik już istnieje")
         else:
-            user = database.create_user(username=username, password=password)
+            user = self.db.create_user(username=username, password=password)
             self.login_user(user=user)
 
     def login_user(self, user):
@@ -142,7 +105,7 @@ class Window:
         username = self.login_entry.get()
         password = self.password_entry.get()
 
-        user_exist = database.check_user(username=username, password=password)
+        user_exist = self.db.check_user(username=username, password=password)
 
         if user_exist:
             self.login_user(user=user_exist)
@@ -150,24 +113,19 @@ class Window:
             print("nie istnieje")
 
     def main_menu(self):
+        # Main Menu Frame
         self.main_menu_frame = ctk.CTkFrame(self.main_frame)
         self.main_menu_frame.pack(fill=tk.BOTH, expand=True)
 
-        title_label = ctk.CTkLabel(self.main_menu_frame,
-                                   text="Saper",
-                                   corner_radius=20)
-        new_game_button = ctk.CTkButton(self.main_menu_frame,
-                                        text="Nowa gra",
-                                        corner_radius=20,
+        # Main Menu Widgets
+        title_label = ctk.CTkLabel(self.main_menu_frame, text="Saper", corner_radius=20)
+        new_game_button = ctk.CTkButton(self.main_menu_frame, text="Nowa gra", corner_radius=20,
                                         command=lambda: self.change_frame(self.main_menu_frame, self.new_game))
-        scoreboard_button = ctk.CTkButton(self.main_menu_frame,
-                                          text="Sala chwały",
-                                          corner_radius=20)
-        exit_button = ctk.CTkButton(self.main_menu_frame,
-                                    text="Wyjście",
-                                    corner_radius=20,
+        scoreboard_button = ctk.CTkButton(self.main_menu_frame, text="Sala chwały", corner_radius=20)
+        exit_button = ctk.CTkButton(self.main_menu_frame, text="Wyjście", corner_radius=20,
                                     command=self.confirm_exit)
 
+        # Main Menu Widgets Placing
         title_label.place(relx=0.5, rely=0.25, relwidth=1, relheight=0.5, anchor="center")
         new_game_button.place(relx=0.5, rely=0.55, relwidth=0.5, relheight=0.12, anchor="center")
         scoreboard_button.place(relx=0.5, rely=0.7, relwidth=0.5, relheight=0.12, anchor="center")
@@ -193,9 +151,11 @@ class Window:
         self.board_frame = ctk.CTkFrame(self.main_game_frame, fg_color="#e0e0e0")
         self.board_frame.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.4 * self.ratio, anchor="center")
 
+        # Board Settings
         self.rows = 10
         self.cols = 10
         self.mines = 10
+
         self.generate_board()
 
     def generate_board(self):
