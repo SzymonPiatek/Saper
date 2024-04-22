@@ -20,6 +20,7 @@ class Window:
         self.font_family = "Arial"
         self.main_font = ctk.CTkFont(family=self.font_family, size=32)
         self.smaller_font = ctk.CTkFont(family=self.font_family, size=28)
+        self.bigger_font = ctk.CTkFont(family="Bauhaus 93", size=224)
 
         # DB and Session
         self.db = Database()
@@ -122,7 +123,7 @@ class Window:
 
     def login_user(self, user):
         self.session.login(user)
-        print(f"Zalogowano jako: {self.session.get_username()}")
+        print(f"Zalogowano jako: {self.session.user_username}")
         self.change_frame(old=self.login_menu_frame, new_func=self.main_menu)
 
     def login_submit(self):
@@ -148,10 +149,11 @@ class Window:
         scoreboard_button = ctk.CTkButton(self.main_menu_frame, text="Sala chwały", corner_radius=20)
         exit_button = ctk.CTkButton(self.main_menu_frame, text="Wyjście", corner_radius=20,
                                     command=self.confirm_exit)
-        login_label = ctk.CTkLabel(self.main_menu_frame, text=self.session.get_username())
+        login_label = ctk.CTkLabel(self.main_menu_frame, text=self.session.user_username)
 
         # Configure Widgets
         self.set_font(frame=self.main_menu_frame)
+        title_label.configure(font=self.bigger_font)
 
         # Main Menu Widgets Placing
         login_label.place(relx=0.99, anchor="ne")
