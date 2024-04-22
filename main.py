@@ -191,6 +191,7 @@ class Window:
 
     def generate_board(self):
         self.board = [[0] * self.cols for _ in range(self.rows)]
+        self.flags = set()
 
         mines_placed = 0
         while mines_placed < self.mines:
@@ -215,7 +216,7 @@ class Window:
                 button = ctk.CTkButton(self.board_frame)
                 button.grid(row=i, column=j, padx=1, pady=1, sticky="nsew")
                 button.bind("<Button-1>", lambda event, row=i, col=j: self.click_tile(row, col))
-
+                button.bind("<Button-3>", lambda event, row=i, col=j: self.mark_flag(row, col, event))
                 if self.board[i][j] == -1:
                     button.configure(text="*")
                 else:
@@ -237,6 +238,17 @@ class Window:
                 for r in range(row - 1, row + 2):
                     for c in range(col - 1, col + 2):
                         self.reveal_empty(r, c)
+
+    def mark_flag(self, row, col, event):
+        if (row, col) in self.flags:
+            self.flags.remove((row, col))
+            if self.board[row][col] == -1:
+                self.buttons[row][col].configure(text="*")
+            else:
+                self.buttons[row][col].configure(text=str(self.board[row][col]))
+        else:
+            self.flags.add((row, col))
+            self.buttons[row][col].configure(text="F")
 
     def update_time(self):
         current_time = int(time.time() - self.start_time)
