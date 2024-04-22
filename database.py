@@ -12,7 +12,7 @@ class Database:
                 '''
                 CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY,
-                    username TEXT NOT NULL,
+                    username TEXT UNIQUE NOT NULL,
                     password TEXT NOT NULL
                     )
                 '''
@@ -34,6 +34,7 @@ class Database:
                 CREATE TABLE IF NOT EXISTS scores (
                     id INTEGER PRIMARY KEY,
                     user_id INTEGER,
+                    difficulty_level INTEGER,
                     score INTEGER,
                     FOREIGN KEY (user_id) REFERENCES users (id)
                     )

@@ -20,6 +20,7 @@ class Window:
         self.font_family = "Arial"
         self.main_font = ctk.CTkFont(family=self.font_family, size=32)
         self.smaller_font = ctk.CTkFont(family=self.font_family, size=28)
+        self.bigger_font = ctk.CTkFont(family="Bauhaus 93", size=224)
 
         # DB and Session
         self.db = Database()
@@ -152,6 +153,7 @@ class Window:
 
         # Configure Widgets
         self.set_font(frame=self.main_menu_frame)
+        title_label.configure(font=self.bigger_font)
 
         # Main Menu Widgets Placing
         login_label.place(relx=0.99, anchor="ne")
