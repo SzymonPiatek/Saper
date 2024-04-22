@@ -100,6 +100,7 @@ class Window:
     def login_user(self, user):
         self.session.login(user)
         print(f"Zalogowano jako: {self.session.get_username()}")
+        self.change_frame(old=self.login_menu_frame, new_func=self.main_menu)
 
     def login_submit(self):
         username = self.login_entry.get()
@@ -118,15 +119,17 @@ class Window:
         self.main_menu_frame.pack(fill=tk.BOTH, expand=True)
 
         # Main Menu Widgets
-        title_label = ctk.CTkLabel(self.main_menu_frame, text="Saper", corner_radius=20)
+        title_label = ctk.CTkLabel(self.main_menu_frame, text="Saper")
         new_game_button = ctk.CTkButton(self.main_menu_frame, text="Nowa gra", corner_radius=20,
                                         command=lambda: self.change_frame(self.main_menu_frame, self.new_game))
         scoreboard_button = ctk.CTkButton(self.main_menu_frame, text="Sala chwały", corner_radius=20)
         exit_button = ctk.CTkButton(self.main_menu_frame, text="Wyjście", corner_radius=20,
                                     command=self.confirm_exit)
+        login_label = ctk.CTkLabel(self.main_menu_frame, text=self.session.get_username())
 
         # Main Menu Widgets Placing
-        title_label.place(relx=0.5, rely=0.25, relwidth=1, relheight=0.5, anchor="center")
+        login_label.place(relx=0.99, anchor="ne")
+        title_label.place(relx=0.5, rely=0.25, anchor="center")
         new_game_button.place(relx=0.5, rely=0.55, relwidth=0.5, relheight=0.12, anchor="center")
         scoreboard_button.place(relx=0.5, rely=0.7, relwidth=0.5, relheight=0.12, anchor="center")
         exit_button.place(relx=0.5, rely=0.85, relwidth=0.5, relheight=0.12, anchor="center")
