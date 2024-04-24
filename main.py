@@ -12,15 +12,32 @@ class Window:
         # Master settings
         self.master = master
         self.master.title("Saper")
-        self.master.geometry("1024x720+0+0")
+
+        self.get_window_size()
+
+        self.master.geometry(f"{self.width}x{self.height}+{self.center_width}+{self.center_height}")
         self.master.resizable(False, False)
         self.master.bind("<Escape>", self.confirm_exit)
 
         # Font settings
         self.font_family = "Arial"
-        self.main_font = ctk.CTkFont(family=self.font_family, size=32)
-        self.smaller_font = ctk.CTkFont(family=self.font_family, size=28)
-        self.bigger_font = ctk.CTkFont(family="Bauhaus 93", size=224)
+        self.font_family_sec = "Bauhaus 93"
+        if 1920 >= self.width > 1600 and 1080 >= self.height > 900:
+            self.main_font = ctk.CTkFont(family=self.font_family, size=36)
+            self.smaller_font = ctk.CTkFont(family=self.font_family, size=32)
+            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=256)
+        elif 1600 >= self.width > 1280 and 900 >= self.height > 720:
+            self.main_font = ctk.CTkFont(family=self.font_family, size=32)
+            self.smaller_font = ctk.CTkFont(family=self.font_family, size=28)
+            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=224)
+        elif 1280 >= self.width > 960 and 720 >= self.height > 540:
+            self.main_font = ctk.CTkFont(family=self.font_family, size=28)
+            self.smaller_font = ctk.CTkFont(family=self.font_family, size=24)
+            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=208)
+        else:
+            self.main_font = ctk.CTkFont(family=self.font_family, size=28)
+            self.smaller_font = ctk.CTkFont(family=self.font_family, size=24)
+            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=208)
 
         # DB and Session
         self.db = Database()
@@ -28,7 +45,6 @@ class Window:
         self.session = Session()
 
         # Game settings
-        self.ratio = 1024 / 720
         self.disabled_buttons = set()
 
         # Main Frame
@@ -37,6 +53,25 @@ class Window:
 
         # Login menu
         self.login_menu()
+
+    def get_window_size(self):
+        self.screen_width = self.master.winfo_screenwidth()
+        self.screen_height = self.master.winfo_screenheight()
+
+        if self.screen_width > 1920:
+            self.width = 1920
+        else:
+            self.width = self.screen_width
+
+        if self.screen_height > 1080:
+            self.height = 1080
+        else:
+            self.height = self.screen_height
+
+        self.center_width = (self.screen_width - self.width) // 2
+        self.center_height = (self.screen_height - self.height) // 2
+
+        self.ratio = self.width / self.height
 
     def set_font(self, frame):
         for widget in frame.winfo_children():
@@ -209,7 +244,7 @@ class Window:
 
         # Board Frame
         self.board_frame = ctk.CTkFrame(self.main_game_frame, fg_color="#e0e0e0")
-        self.board_frame.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.4 * self.ratio, anchor="center")
+        self.board_frame.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.4, anchor="center")
 
         # Functions
         self.generate_board()
