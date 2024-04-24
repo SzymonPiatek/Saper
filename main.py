@@ -185,11 +185,11 @@ class Window:
 
         # Level Widgets
         amateur_button = ctk.CTkButton(self.level_frame, text="Amator", corner_radius=20,
-                                       command=lambda: self.start_game(9, 9, 10))
+                                       command=lambda: self.start_game(0))
         medium_button = ctk.CTkButton(self.level_frame, text="Średni", corner_radius=20,
-                                      command=lambda: self.start_game(16, 16, 40))
+                                      command=lambda: self.start_game(1))
         expert_button = ctk.CTkButton(self.level_frame, text="Ekspert", corner_radius=20,
-                                      command=lambda: self.start_game(30, 16, 99))
+                                      command=lambda: self.start_game(2))
         back_button = ctk.CTkButton(self.level_frame, text="Powrót do menu", corner_radius=20,
                                     command=lambda: self.change_frame(old=self.level_frame,
                                                                       new_func=self.main_menu))
@@ -203,10 +203,28 @@ class Window:
         expert_button.place(relx=0.5, rely=0.6, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
         back_button.place(relx=0.5, rely=0.9, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
 
-    def start_game(self, rows, cols, mines):
-        self.rows = rows
-        self.cols = cols
-        self.mines = mines
+    def start_game(self, difficulty):
+        self.difficulty = difficulty
+        if self.difficulty == 0:
+            self.rows = 9
+            self.cols = 9
+            self.mines = 10
+        elif self.difficulty == 1:
+            self.rows = 16
+            self.cols = 16
+            self.mines = 40
+        elif self.difficulty == 2:
+            self.mines = 99
+            if self.width > self.height:
+                self.rows = 16
+                self.cols = 30
+            elif self.width > self.height:
+                self.rows = 30
+                self.cols = 16
+            elif self.width == self.height:
+                self.rows = 20
+                self.cols = 24
+
 
         self.change_frame(old=self.level_frame, new_func=self.new_game)
 
@@ -249,7 +267,7 @@ class Window:
         self.set_font(frame=self.main_game_frame)
 
         # Main Game Widgets Placing
-        self.time_label.place(relx=0.5, rely=0.075, relheight=0.1, anchor="center")
+        self.time_label.place(relx=0.5, rely=0.05, relheight=0.1, anchor="center")
 
         # Functions
         self.start_time = time.time()
@@ -257,7 +275,8 @@ class Window:
 
         # Board Frame
         self.board_frame = ctk.CTkFrame(self.main_game_frame, fg_color="#e0e0e0")
-        self.board_frame.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.4, anchor="center")
+        self.board_frame.place(relx=0.5, rely=0.5, relwidth=(0.7 / self.ratio) / (self.rows/self.cols),
+                               relheight=0.7, anchor="center")
 
         # Functions
         self.generate_board()
