@@ -190,14 +190,18 @@ class Window:
                                       command=lambda: self.start_game(16, 16, 40))
         expert_button = ctk.CTkButton(self.level_frame, text="Ekspert", corner_radius=20,
                                       command=lambda: self.start_game(30, 16, 99))
+        back_button = ctk.CTkButton(self.level_frame, text="Powrót do menu", corner_radius=20,
+                                    command=lambda: self.change_frame(old=self.level_frame,
+                                                                      new_func=self.main_menu))
 
         # Configure Widgets
         self.set_font(frame=self.level_frame)
 
         # Level Widgets Placing
-        amateur_button.place(relx=0.5, rely=0.3, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
-        medium_button.place(relx=0.5, rely=0.5, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
-        expert_button.place(relx=0.5, rely=0.7, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        amateur_button.place(relx=0.5, rely=0.2, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        medium_button.place(relx=0.5, rely=0.4, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        expert_button.place(relx=0.5, rely=0.6, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        back_button.place(relx=0.5, rely=0.9, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
 
     def start_game(self, rows, cols, mines):
         self.rows = rows
@@ -240,6 +244,9 @@ class Window:
         # Main Game Widgets
         self.time_label = ctk.CTkLabel(master=self.main_game_frame,
                                        text="00:00")
+
+        # Configure Widgets
+        self.set_font(frame=self.main_game_frame)
 
         # Main Game Widgets Placing
         self.time_label.place(relx=0.5, rely=0.075, relheight=0.1, anchor="center")
