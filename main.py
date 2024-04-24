@@ -225,7 +225,6 @@ class Window:
                 self.rows = 20
                 self.cols = 24
 
-
         self.change_frame(old=self.level_frame, new_func=self.new_game)
 
     def main_menu(self):
@@ -262,24 +261,26 @@ class Window:
         # Main Game Widgets
         self.time_label = ctk.CTkLabel(master=self.main_game_frame,
                                        text="00:00")
+        back_button = ctk.CTkButton(self.main_game_frame, text="Powrót do menu", corner_radius=20,
+                                    command=lambda: self.change_frame(old=self.main_game_frame,
+                                                                      new_func=self.main_menu))
 
         # Configure Widgets
         self.set_font(frame=self.main_game_frame)
 
         # Main Game Widgets Placing
         self.time_label.place(relx=0.5, rely=0.05, relheight=0.1, anchor="center")
-
-        # Functions
-        self.start_time = time.time()
-        self.update_time()
+        back_button.place(relx=0.5, rely=0.9, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
 
         # Board Frame
         self.board_frame = ctk.CTkFrame(self.main_game_frame, fg_color="#e0e0e0")
-        self.board_frame.place(relx=0.5, rely=0.5, relwidth=(0.7 / self.ratio) / (self.rows/self.cols),
+        self.board_frame.place(relx=0.5, rely=0.45, relwidth=(0.7 / self.ratio) / (self.rows/self.cols),
                                relheight=0.7, anchor="center")
 
         # Functions
         self.generate_board()
+        self.start_time = time.time()
+        self.update_time()
 
     def generate_board(self):
         self.board = [[0] * self.cols for _ in range(self.rows)]
