@@ -35,9 +35,9 @@ class Window:
             self.smaller_font = ctk.CTkFont(family=self.font_family, size=24)
             self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=208)
         else:
-            self.main_font = ctk.CTkFont(family=self.font_family, size=28)
-            self.smaller_font = ctk.CTkFont(family=self.font_family, size=24)
-            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=208)
+            self.main_font = ctk.CTkFont(family=self.font_family, size=24)
+            self.smaller_font = ctk.CTkFont(family=self.font_family, size=20)
+            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=196)
 
         # DB and Session
         self.db = Database()
@@ -46,6 +46,8 @@ class Window:
 
         # Game settings
         self.disabled_buttons = set()
+        self.relwidth = 0.35
+        self.relheight = 0.075
 
         # Main Frame
         self.main_frame = ctk.CTkFrame(self.master)
@@ -92,7 +94,7 @@ class Window:
 
         # Login Widgets
         register_label = ctk.CTkLabel(master=self.login_menu_frame, text="Nie masz konta?")
-        register_button = ctk.CTkButton(master=self.login_menu_frame, text="Stwórz konto",
+        register_button = ctk.CTkButton(master=self.login_menu_frame, text="Stwórz konto", corner_radius=20,
                                         command=lambda: self.change_frame(self.login_menu_frame,
                                                                           self.register_menu))
         login_label = ctk.CTkLabel(master=self.login_menu_frame, text="Login")
@@ -107,13 +109,17 @@ class Window:
         register_label.configure(font=self.smaller_font)
 
         # Login Widgets Placing
-        login_label.place(relx=0.5, rely=0.25, anchor="center")
-        self.login_entry.place(relx=0.5, rely=0.32, relwidth=0.4, anchor="center")
-        password_label.place(relx=0.5, rely=0.4, anchor="center")
-        self.password_entry.place(relx=0.5, rely=0.47, relwidth=0.4, anchor="center")
-        submit_button.place(relx=0.5, rely=0.6, relwidth=0.4, anchor="center")
-        register_label.place(relx=0.5, rely=0.8, anchor="center")
-        register_button.place(relx=0.5, rely=0.9, relwidth=0.3, anchor="center")
+        login_label.place(relx=0.5, rely=3 / 16, anchor="center")
+        self.login_entry.place(relx=0.5, rely=4 / 16, relwidth=self.relwidth, relheight=self.relheight,
+                               anchor="center")
+        password_label.place(relx=0.5, rely=6 / 16, anchor="center")
+        self.password_entry.place(relx=0.5, rely=7 / 16, relwidth=self.relwidth, relheight=self.relheight,
+                                  anchor="center")
+        submit_button.place(relx=0.5, rely=9 / 16, relwidth=self.relwidth, relheight=self.relheight,
+                            anchor="center")
+        register_label.place(relx=0.5, rely=12 / 16, anchor="center")
+        register_button.place(relx=0.5, rely=13 / 16, relwidth=self.relwidth, relheight=self.relheight,
+                              anchor="center")
 
     def register_menu(self):
         # Login Frame
@@ -137,12 +143,12 @@ class Window:
 
         # Login Widgets Placing
         login_label.place(relx=0.5, rely=0.25, anchor="center")
-        self.login_entry.place(relx=0.5, rely=0.32, relwidth=0.4, anchor="center")
+        self.login_entry.place(relx=0.5, rely=0.32, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
         password_label.place(relx=0.5, rely=0.4, anchor="center")
-        self.password_entry.place(relx=0.5, rely=0.47, relwidth=0.4, anchor="center")
-        submit_button.place(relx=0.5, rely=0.6, relwidth=0.4, anchor="center")
+        self.password_entry.place(relx=0.5, rely=0.47, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        submit_button.place(relx=0.5, rely=0.6, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
         login_ask_label.place(relx=0.5, rely=0.8, anchor="center")
-        login_button.place(relx=0.5, rely=0.9, relwidth=0.2, anchor="center")
+        login_button.place(relx=0.5, rely=0.9, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
 
     def create_user(self):
         username = self.login_entry.get()
@@ -189,9 +195,9 @@ class Window:
         self.set_font(frame=self.level_frame)
 
         # Level Widgets Placing
-        amateur_button.place(relx=0.5, rely=0.3, relwidth=0.5, relheight=0.15, anchor="center")
-        medium_button.place(relx=0.5, rely=0.5, relwidth=0.5, relheight=0.15, anchor="center")
-        expert_button.place(relx=0.5, rely=0.7, relwidth=0.5, relheight=0.15, anchor="center")
+        amateur_button.place(relx=0.5, rely=0.3, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        medium_button.place(relx=0.5, rely=0.5, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        expert_button.place(relx=0.5, rely=0.7, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
 
     def start_game(self, rows, cols, mines):
         self.rows = rows
@@ -220,11 +226,11 @@ class Window:
         title_label.configure(font=self.bigger_font)
 
         # Main Menu Widgets Placing
-        login_label.place(relx=0.99, anchor="ne")
+        login_label.place(relx=0.99, rely=0.01, anchor="ne")
         title_label.place(relx=0.5, rely=0.25, anchor="center")
-        new_game_button.place(relx=0.5, rely=0.55, relwidth=0.5, relheight=0.12, anchor="center")
-        scoreboard_button.place(relx=0.5, rely=0.7, relwidth=0.5, relheight=0.12, anchor="center")
-        exit_button.place(relx=0.5, rely=0.85, relwidth=0.5, relheight=0.12, anchor="center")
+        new_game_button.place(relx=0.5, rely=0.55, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        scoreboard_button.place(relx=0.5, rely=0.7, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        exit_button.place(relx=0.5, rely=0.85, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
 
     def new_game(self):
         # Main Game Frame
