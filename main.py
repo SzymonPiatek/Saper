@@ -137,6 +137,34 @@ class Window:
         else:
             print("nie istnieje")
 
+    def level_selection(self):
+        # Level Frame
+        self.level_frame = ctk.CTkFrame(self.main_frame)
+        self.level_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Level Widgets
+        amateur_button = ctk.CTkButton(self.level_frame, text="Amator", corner_radius=20,
+                                       command=lambda: self.start_game(9, 9, 10))
+        medium_button = ctk.CTkButton(self.level_frame, text="Średni", corner_radius=20,
+                                      command=lambda: self.start_game(16, 16, 40))
+        expert_button = ctk.CTkButton(self.level_frame, text="Ekspert", corner_radius=20,
+                                      command=lambda: self.start_game(30, 16, 99))
+
+        # Configure Widgets
+        self.set_font(frame=self.level_frame)
+
+        # Level Widgets Placing
+        amateur_button.place(relx=0.5, rely=0.3, relwidth=0.5, relheight=0.15, anchor="center")
+        medium_button.place(relx=0.5, rely=0.5, relwidth=0.5, relheight=0.15, anchor="center")
+        expert_button.place(relx=0.5, rely=0.7, relwidth=0.5, relheight=0.15, anchor="center")
+
+    def start_game(self, rows, cols, mines):
+        self.rows = rows
+        self.cols = cols
+        self.mines = mines
+
+        self.change_frame(old=self.level_frame, new_func=self.new_game)
+
     def main_menu(self):
         # Main Menu Frame
         self.main_menu_frame = ctk.CTkFrame(self.main_frame)
@@ -145,7 +173,8 @@ class Window:
         # Main Menu Widgets
         title_label = ctk.CTkLabel(self.main_menu_frame, text="Saper")
         new_game_button = ctk.CTkButton(self.main_menu_frame, text="Nowa gra", corner_radius=20,
-                                        command=lambda: self.change_frame(self.main_menu_frame, self.new_game))
+                                        command=lambda: self.change_frame(old=self.main_menu_frame,
+                                                                          new_func=self.level_selection))
         scoreboard_button = ctk.CTkButton(self.main_menu_frame, text="Sala chwały", corner_radius=20)
         exit_button = ctk.CTkButton(self.main_menu_frame, text="Wyjście", corner_radius=20,
                                     command=self.confirm_exit)
@@ -182,11 +211,7 @@ class Window:
         self.board_frame = ctk.CTkFrame(self.main_game_frame, fg_color="#e0e0e0")
         self.board_frame.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.4 * self.ratio, anchor="center")
 
-        # Board Settings
-        self.rows = 10
-        self.cols = 10
-        self.mines = 10
-
+        # Functions
         self.generate_board()
 
     def generate_board(self):
