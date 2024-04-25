@@ -317,11 +317,12 @@ class Window:
                 self.buttons[i][j] = button
 
     def click_tile(self, row, col):
-        if self.board[row][col] == -1:
-            messagebox.showinfo("Game Over", "You clicked on a mine! Game Over.")
-            self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
-        else:
-            self.reveal_empty(row, col)
+        if (row, col) not in self.flags:
+            if self.board[row][col] == -1:
+                messagebox.showinfo("Game Over", "You clicked on a mine! Game Over.")
+                self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
+            else:
+                self.reveal_empty(row, col)
 
     def reveal_empty(self, row, col):
         if 0 <= row < self.rows and 0 <= col < self.cols and (row, col) not in self.disabled_buttons:
