@@ -323,6 +323,9 @@ class Window:
                 # button.bind("<Button-3>", lambda event, row=row, col=col: self.mark_flag(row, col, event))
 
     def click_tile(self, row, col, button):
+        if button.cget('state') == 'disabled':
+            return
+
         cell = self.board.get_cell_by_axis(x=row, y=col)
 
         if cell.value == -1:
@@ -335,35 +338,13 @@ class Window:
                 self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
             self.reveal_empty(row, col)
             print(f"TR: {self.board.tiles_revealed}, T: {self.board.tiles}, M: {self.board.mines}")
-            button.configure(text=self.board.check_value(tile=cell))
+            button.configure(text=self.board.check_value(tile=cell), state='disabled')
 
     def reveal_empty(self, row, col):
         tile = self.board.get_cell_by_axis(x=row, y=col)
         self.board.check_value(tile=tile)
         self.board.check_tiles_revealed(tile=tile)
 
-    # def click_tile(self, row, col):
-    #     cell = self.board.get_cell_by_axis(x=row, y=col)
-    #     if cell.value == -1:
-    #         messagebox.showinfo("Game Over", "Trafiłeś na minę. Przegrałeś!")
-    #         self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
-    #     else:
-    #         self.reveal_empty(row, col)
-    #
-    # def reveal_empty(self, row, col):
-    #     self.board.check_value(tile=self.board.get_cell_by_axis(x=row, y=col))
-    #
-    #     pass
-
-    #
-    # def reveal_empty(self, row, col):
-    #     if 0 <= row < self.rows and 0 <= col < self.cols and (row, col) not in self.disabled_buttons:
-    #         self.disabled_buttons.add((row, col))
-    #         self.buttons[row][col].configure(text=str(self.board[row][col]))
-    #         if self.board[row][col] == 0:
-    #             for r in range(row - 1, row + 2):
-    #                 for c in range(col - 1, col + 2):
-    #                     self.reveal_empty(r, c)
     #
     # def mark_flag(self, row, col, event):
     #     if (row, col) not in self.disabled_buttons:
