@@ -8,6 +8,7 @@ class Database:
         try:
             conn = sqlite3.connect(self.db_name)
             cursor = conn.cursor()
+
             cursor.execute(
                 '''
                 CREATE TABLE IF NOT EXISTS users (
@@ -18,7 +19,6 @@ class Database:
                 '''
             )
             conn.commit()
-            print("Utworzono tabelę użytkowników")
         except sqlite3.Error as e:
             print(e)
         finally:
@@ -41,7 +41,6 @@ class Database:
                 '''
             )
             conn.commit()
-            print("Utworzono tabelę wyników")
         except sqlite3.Error as e:
             print(e)
         finally:
@@ -60,8 +59,25 @@ class Database:
                 ''', (username, password)
             )
             conn.commit()
-            print(f"Utworzono użytkownika {username}")
             return self.check_user(username=username, password=password)
+        except sqlite3.Error as e:
+            print(e)
+        finally:
+            if conn:
+                conn.close()
+
+    def insert_score(self, user_id, difficulty_level, score):
+        try:
+            conn = sqlite3.connect(self.db_name)
+            cursor = conn.cursor()
+
+            cursor.execute(
+                '''
+                INSERT INTO scores (user_id, difficulty_level, score)
+                VALUES (?, ?, ?)
+                ''', (user_id, difficulty_level, score)
+            )
+            conn.commit()
         except sqlite3.Error as e:
             print(e)
         finally:

@@ -5,6 +5,7 @@ import time
 import random
 from database import Database
 from session import Session
+from objects import *
 
 
 class Window:
@@ -15,9 +16,16 @@ class Window:
 
         self.get_window_size()
 
-        self.master.geometry(f"{self.width}x{self.height}+{self.center_width}+{self.center_height}")
+        self.fullscreen_mode = True
+
+        if self.fullscreen_mode:
+            self.master.attributes("-fullscreen", True)
+        else:
+            self.master.geometry(f"{self.width}x{self.height}+{self.center_width}+{self.center_height}")
         self.master.resizable(False, False)
         self.master.bind("<Escape>", self.confirm_exit)
+
+        self.is_testing = True
 
         # Font settings
         self.font_family = "Arial"
@@ -49,6 +57,12 @@ class Window:
         self.relwidth = 0.35
         self.relheight = 0.075
 
+        # Colors
+        self.tile_color = "#2c6cab"
+        self.tile_flagged_color = "#2cab5b"
+        self.tile_mine_color = "#b80000"
+        self.tile_revealed_color = "#6d7073"
+
         # Main Frame
         self.main_frame = ctk.CTkFrame(self.master)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
@@ -57,8 +71,8 @@ class Window:
         self.login_menu()
 
     def get_window_size(self):
-        self.screen_width = self.master.winfo_screenwidth()
-        self.screen_height = self.master.winfo_screenheight()
+        self.screen_width = self.master.winfo_screenwidth() - 100
+        self.screen_height = self.master.winfo_screenheight() - 100
 
         if self.screen_width > 1920:
             self.width = 1920
@@ -157,14 +171,14 @@ class Window:
         user_exist = self.db.check_user(username=username, password=password)
 
         if user_exist:
-            print("Taki użytkownik już istnieje")
+            messagebox.showinfo("Informacja", "Taki użytkownik już istnieje")
         else:
             user = self.db.create_user(username=username, password=password)
             self.login_user(user=user)
 
     def login_user(self, user):
         self.session.login(user)
-        print(f"Zalogowano jako: {self.session.user_username}")
+        messagebox.showinfo("Informacja", f"Zalogowano jako: {self.session.user_username}")
         self.change_frame(old=self.login_menu_frame, new_func=self.main_menu)
 
     def login_submit(self):
@@ -173,10 +187,39 @@ class Window:
 
         user_exist = self.db.check_user(username=username, password=password)
 
+        if self.is_testing:
+            user_exist = self.db.check_user(username="admin", password="admin")
+
         if user_exist:
             self.login_user(user=user_exist)
         else:
-            print("nie istnieje")
+            messagebox.showinfo("Informacja", "Nie istnieje")
+
+    def main_menu(self):
+        # Main Menu Frame
+        self.main_menu_frame = ctk.CTkFrame(self.main_frame)
+        self.main_menu_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Main Menu Widgets
+        title_label = ctk.CTkLabel(self.main_menu_frame, text="Saper")
+        new_game_button = ctk.CTkButton(self.main_menu_frame, text="Nowa gra", corner_radius=20,
+                                        command=lambda: self.change_frame(old=self.main_menu_frame,
+                                                                          new_func=self.level_selection))
+        scoreboard_button = ctk.CTkButton(self.main_menu_frame, text="Sala chwały", corner_radius=20)
+        exit_button = ctk.CTkButton(self.main_menu_frame, text="Wyjście", corner_radius=20,
+                                    command=self.confirm_exit)
+        login_label = ctk.CTkLabel(self.main_menu_frame, text=self.session.user_username)
+
+        # Configure Widgets
+        self.set_font(frame=self.main_menu_frame)
+        title_label.configure(font=self.bigger_font)
+
+        # Main Menu Widgets Placing
+        login_label.place(relx=0.99, rely=0.01, anchor="ne")
+        title_label.place(relx=0.5, rely=0.25, anchor="center")
+        new_game_button.place(relx=0.5, rely=0.55, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        scoreboard_button.place(relx=0.5, rely=0.7, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        exit_button.place(relx=0.5, rely=0.85, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
 
     def level_selection(self):
         # Level Frame
@@ -205,6 +248,7 @@ class Window:
 
     def start_game(self, difficulty):
         self.difficulty = difficulty
+
         if self.difficulty == 0:
             self.rows = 9
             self.cols = 9
@@ -227,33 +271,10 @@ class Window:
 
         self.change_frame(old=self.level_frame, new_func=self.new_game)
 
-    def main_menu(self):
-        # Main Menu Frame
-        self.main_menu_frame = ctk.CTkFrame(self.main_frame)
-        self.main_menu_frame.pack(fill=tk.BOTH, expand=True)
-
-        # Main Menu Widgets
-        title_label = ctk.CTkLabel(self.main_menu_frame, text="Saper")
-        new_game_button = ctk.CTkButton(self.main_menu_frame, text="Nowa gra", corner_radius=20,
-                                        command=lambda: self.change_frame(old=self.main_menu_frame,
-                                                                          new_func=self.level_selection))
-        scoreboard_button = ctk.CTkButton(self.main_menu_frame, text="Sala chwały", corner_radius=20)
-        exit_button = ctk.CTkButton(self.main_menu_frame, text="Wyjście", corner_radius=20,
-                                    command=self.confirm_exit)
-        login_label = ctk.CTkLabel(self.main_menu_frame, text=self.session.user_username)
-
-        # Configure Widgets
-        self.set_font(frame=self.main_menu_frame)
-        title_label.configure(font=self.bigger_font)
-
-        # Main Menu Widgets Placing
-        login_label.place(relx=0.99, rely=0.01, anchor="ne")
-        title_label.place(relx=0.5, rely=0.25, anchor="center")
-        new_game_button.place(relx=0.5, rely=0.55, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
-        scoreboard_button.place(relx=0.5, rely=0.7, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
-        exit_button.place(relx=0.5, rely=0.85, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
-
     def new_game(self):
+        if hasattr(self, "main_game_frame"):
+            self.main_game_frame.destroy()
+
         # Main Game Frame
         self.main_game_frame = ctk.CTkFrame(self.main_frame)
         self.main_game_frame.pack(fill=tk.BOTH, expand=True)
@@ -261,6 +282,8 @@ class Window:
         # Main Game Widgets
         self.time_label = ctk.CTkLabel(master=self.main_game_frame,
                                        text="00:00")
+        self.count_mines_label = ctk.CTkLabel(master=self.main_game_frame,
+                                              text=self.mines)
         back_button = ctk.CTkButton(self.main_game_frame, text="Powrót do menu", corner_radius=20,
                                     command=lambda: self.change_frame(old=self.main_game_frame,
                                                                       new_func=self.main_menu))
@@ -269,7 +292,8 @@ class Window:
         self.set_font(frame=self.main_game_frame)
 
         # Main Game Widgets Placing
-        self.time_label.place(relx=0.5, rely=0.05, relheight=0.1, anchor="center")
+        self.time_label.place(relx=0.6, rely=0.05, relheight=0.1, anchor="center")
+        self.count_mines_label.place(relx=0.4, rely=0.05, relheight=0.1, anchor="center")
         back_button.place(relx=0.5, rely=0.9, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
 
         # Board Frame
@@ -283,76 +307,87 @@ class Window:
         self.update_time()
 
     def generate_board(self):
-        self.board = [[0] * self.cols for _ in range(self.rows)]
-        self.flags = set()
+        self.board = Board(rows=self.rows,
+                           cols=self.cols,
+                           mines=self.mines)
 
-        mines_placed = 0
-        while mines_placed < self.mines:
-            row = random.randint(0, self.rows - 1)
-            col = random.randint(0, self.cols - 1)
-            if self.board[row][col] == 0:
-                self.board[row][col] = -1
-                mines_placed += 1
+        self.board.generate_board()
 
-        for row in range(self.rows):
-            for col in range(self.cols):
-                if self.board[row][col] != -1:
-                    self.board[row][col] = sum(1 for r in range(row - 1, row + 2)
-                                               for c in range(col - 1, col + 2)
-                                               if 0 <= r < self.rows and 0 <= c < self.cols and self.board[r][c] == -1)
+        self.buttons = []
 
-        self.buttons = [[None] * self.cols for _ in range(self.rows)]
-        for i in range(self.rows):
-            self.board_frame.grid_rowconfigure(i, weight=1)
-            for j in range(self.cols):
-                self.board_frame.grid_columnconfigure(j, weight=1)
-                button = ctk.CTkButton(self.board_frame)
-                button.grid(row=i, column=j, padx=1, pady=1, sticky="nsew")
-                button.bind("<Button-1>", lambda event, row=i, col=j: self.click_tile(row, col))
-                button.bind("<Button-3>", lambda event, row=i, col=j: self.mark_flag(row, col, event))
-                if self.board[i][j] == -1:
-                    button.configure(text="*")
-                else:
-                    button.configure(text="")
-                self.buttons[i][j] = button
+        for row in range(0, self.board.rows):
+            self.board_frame.grid_rowconfigure(row, weight=1)
+            for col in range(0, self.board.cols):
+                self.board_frame.grid_columnconfigure(col, weight=1)
 
-    def click_tile(self, row, col):
-        if (row, col) not in self.flags:
-            if self.board[row][col] == -1:
-                messagebox.showinfo("Game Over", "You clicked on a mine! Game Over.")
-                self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
-            else:
-                self.reveal_empty(row, col)
+                button = ctk.CTkButton(self.board_frame, text=" ", fg_color=self.tile_color)
+                button.grid(row=row, column=col, padx=1, pady=1, sticky="nsew")
 
-    def reveal_empty(self, row, col):
-        if 0 <= row < self.rows and 0 <= col < self.cols and (row, col) not in self.disabled_buttons:
-            self.disabled_buttons.add((row, col))
-            self.buttons[row][col].configure(text=str(self.board[row][col]))
-            if self.board[row][col] == 0:
-                for r in range(row - 1, row + 2):
-                    for c in range(col - 1, col + 2):
-                        self.reveal_empty(r, c)
+                if self.is_testing:
+                    cell = self.board.get_cell_by_axis(x=row, y=col)
+                    button.configure(text=cell.value)
 
-    def mark_flag(self, row, col, event):
-        if (row, col) not in self.disabled_buttons:
-            if (row, col) in self.flags:
-                self.flags.remove((row, col))
-                self.update_button_text(row, col)
-            else:
-                self.flags.add((row, col))
-                self.buttons[row][col].configure(text="F")
-    def update_button_text(self, row, col):
-        if self.board[row][col] == -1:
-            self.buttons[row][col].configure(text="*" if (row, col) not in self.flags else "")
+                button.bind("<Button-1>", lambda event, row=row, col=col, button=button: self.click_tile(row, col, button))
+                button.bind("<Button-3>", lambda event, row=row, col=col, button=button: self.mark_flag(row, col, button))
+
+    def click_tile(self, row, col, button):
+        if button.cget('state') == 'disabled':
+            return
+
+        cell = self.board.get_cell_by_axis(x=row, y=col)
+
+        if cell.value == -1:
+            button.configure(fg_color=self.tile_mine_color)
+            messagebox.showinfo("Game Over", "Trafiłeś na minę. Przegrałeś!")
+            self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
         else:
-            self.buttons[row][col].configure(text=str(self.board[row][col]) if (row, col) not in self.flags else "F")
+            self.board.check_value(cell)
+            button.configure(fg_color=self.tile_revealed_color)
+            if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
+                self.player_win()
+            self.reveal_empty(cell)
+            button.configure(text=self.board.check_value(tile=cell), state='disabled')
+
+    def reveal_empty(self, cell):
+        self.board.check_value(tile=cell)
+        self.board.check_tiles_revealed(tile=cell)
+
+    def mark_flag(self, row, col, button):
+        cell = self.board.get_cell_by_axis(x=row, y=col)
+
+        if not cell.is_revealed:
+            if not cell.is_flagged:
+                button.configure(fg_color=self.tile_flagged_color)
+                cell.is_flagged = True
+                self.board.flags += 1
+                if cell.value == -1:
+                    self.board.mines_revealed += 1
+                button.configure(state='disabled')
+            else:
+                button.configure(fg_color=self.tile_color)
+                cell.is_flagged = False
+                self.board.flags -= 1
+                if cell.value == -1:
+                    self.board.mines_revealed -= 1
+                    button.configure(state='normal')
+
+            if self.board.flags == self.board.mines_revealed and self.board.mines == self.board.mines_revealed:
+                self.player_win()
+
+    def player_win(self):
+        self.db.insert_score(user_id=self.session.user_id,
+                             difficulty_level=self.difficulty,
+                             score=self.get_time())
+        messagebox.showinfo("You won", "Wygrałeś!")
+        self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
+
+    def get_time(self):
+        return int(time.time() - self.start_time)
 
     def update_time(self):
         current_time = int(time.time() - self.start_time)
-        minutes = current_time // 60
-        seconds = current_time % 60
 
-        time_str = "{:02d}:{:02d}".format(minutes, seconds)
+        time_str = "{:02d}".format(current_time)
 
         self.time_label.configure(text=time_str)
         self.time_label.after(1000, self.update_time)
