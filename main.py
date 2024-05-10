@@ -334,15 +334,18 @@ class Window:
                         self.reveal_empty(r, c)
 
     def mark_flag(self, row, col, event):
-        if (row, col) in self.flags:
-            self.flags.remove((row, col))
-            if self.board[row][col] == -1:
-                self.buttons[row][col].configure(text="*")
+        if (row, col) not in self.disabled_buttons:
+            if (row, col) in self.flags:
+                self.flags.remove((row, col))
+                self.update_button_text(row, col)
             else:
-                self.buttons[row][col].configure(text=str(self.board[row][col]))
+                self.flags.add((row, col))
+                self.buttons[row][col].configure(text="F")
+    def update_button_text(self, row, col):
+        if self.board[row][col] == -1:
+            self.buttons[row][col].configure(text="*" if (row, col) not in self.flags else "")
         else:
-            self.flags.add((row, col))
-            self.buttons[row][col].configure(text="F")
+            self.buttons[row][col].configure(text=str(self.board[row][col]) if (row, col) not in self.flags else "F")
 
     def update_time(self):
         current_time = int(time.time() - self.start_time)
