@@ -6,7 +6,7 @@ class Tile:
     def __init__(self, col, row, value):
         self.col = col
         self.row = row
-        self.is_flaged = False
+        self.is_flagged = False
         self.is_revealed = False
         self.value = value
 

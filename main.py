@@ -324,7 +324,7 @@ class Window:
                     button.configure(text="")
 
                 button.bind("<Button-1>", lambda event, row=row, col=col, button=button: self.click_tile(row, col, button))
-                # button.bind("<Button-3>", lambda event, row=row, col=col: self.mark_flag(row, col, event))
+                button.bind("<Button-3>", lambda event, row=row, col=col, button=button: self.mark_flag(row, col, button))
 
     def click_tile(self, row, col, button):
         if button.cget('state') == 'disabled':
@@ -340,15 +340,26 @@ class Window:
             if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                 messagebox.showinfo("You won", "Wygrałeś!")
                 self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
-            self.reveal_empty(row, col)
+            self.reveal_empty(cell)
             button.configure(text=self.board.check_value(tile=cell), state='disabled')
 
-    def reveal_empty(self, row, col):
-        tile = self.board.get_cell_by_axis(x=row, y=col)
-        self.board.check_value(tile=tile)
-        self.board.check_tiles_revealed(tile=tile)
+    def reveal_empty(self, cell):
+        self.board.check_value(tile=cell)
+        self.board.check_tiles_revealed(tile=cell)
 
-    #
+    def mark_flag(self, row, col, button):
+        cell = self.board.get_cell_by_axis(x=row, y=col)
+
+        if not cell.is_flagged:
+            cell.is_flagged = True
+            button.configure(text="F", state='disabled')
+        else:
+            cell.is_flagged = False
+            if cell.is_revealed:
+                button.configure(text=cell.value, state='normal')
+            else:
+                button.configure(text="", state='normal')
+
     # def mark_flag(self, row, col, event):
     #     if (row, col) not in self.disabled_buttons:
     #         if (row, col) in self.flags:
