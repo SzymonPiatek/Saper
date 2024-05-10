@@ -5,6 +5,7 @@ import time
 import random
 from database import Database
 from session import Session
+from objects import *
 
 
 class Window:
@@ -15,7 +16,8 @@ class Window:
 
         self.get_window_size()
 
-        self.master.geometry(f"{self.width}x{self.height}+{self.center_width}+{self.center_height}")
+        # self.master.geometry(f"{self.width}x{self.height}+{self.center_width}+{self.center_height}")
+        self.master.geometry("1280x720")
         self.master.resizable(False, False)
         self.master.bind("<Escape>", self.confirm_exit)
 
@@ -290,69 +292,80 @@ class Window:
         self.update_time()
 
     def generate_board(self):
-        self.board = [[0] * self.cols for _ in range(self.rows)]
-        self.flags = set()
+        self.board = Board(rows=self.rows,
+                           cols=self.cols,
+                           mines=self.mines)
 
-        mines_placed = 0
-        while mines_placed < self.mines:
-            row = random.randint(0, self.rows - 1)
-            col = random.randint(0, self.cols - 1)
-            if self.board[row][col] == 0:
-                self.board[row][col] = -1
-                mines_placed += 1
+        self.board.generate_board()
 
-        for row in range(self.rows):
-            for col in range(self.cols):
-                if self.board[row][col] != -1:
-                    self.board[row][col] = sum(1 for r in range(row - 1, row + 2)
-                                               for c in range(col - 1, col + 2)
-                                               if 0 <= r < self.rows and 0 <= c < self.cols and self.board[r][c] == -1)
+        self.buttons = []
+        for row in range(self.board.rows - 1):
+            self.board_frame.grid_rowconfigure(row, weight=1)
+            for col in range(self.board.cols - 1):
+                self.board_frame.grid_columnconfigure(col, weight=1)
 
-        self.buttons = [[None] * self.cols for _ in range(self.rows)]
-        for i in range(self.rows):
-            self.board_frame.grid_rowconfigure(i, weight=1)
-            for j in range(self.cols):
-                self.board_frame.grid_columnconfigure(j, weight=1)
                 button = ctk.CTkButton(self.board_frame)
-                button.grid(row=i, column=j, padx=1, pady=1, sticky="nsew")
-                button.bind("<Button-1>", lambda event, row=i, col=j: self.click_tile(row, col))
-                button.bind("<Button-3>", lambda event, row=i, col=j: self.mark_flag(row, col, event))
-                if self.board[i][j] == -1:
-                    button.configure(text="*")
-                else:
-                    button.configure(text="")
-                self.buttons[i][j] = button
+                button.grid(row=row, column=col, padx=1, pady=1, sticky="nsew")
 
-    def click_tile(self, row, col):
-        if (row, col) not in self.flags:
-            if self.board[row][col] == -1:
-                messagebox.showinfo("Game Over", "Trafiłeś na minę. Przegrałeś!")
-                self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
-            else:
-                self.reveal_empty(row, col)
+                cell = self.board.get_cell_by_axis(x=row, y=col)
+                if cell.value == -1:
+                    button.configure(fg_color="red", text="")
+                else:
+                    button.configure(text=cell.value)
+
+                button.bind("<Button-1>", lambda event, row=row, col=col, button=button: self.click_tile(row, col, button))
+                # button.bind("<Button-3>", lambda event, row=row, col=col: self.mark_flag(row, col, event))
+
+    def click_tile(self, row, col, button):
+        print(f"Row: {row}, Col: {col}")
+        cell = self.board.get_cell_by_axis(x=row, y=col)
+        if cell.value == -1:
+            messagebox.showinfo("Game Over", "Trafiłeś na minę. Przegrałeś!")
+            self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
+        else:
+            self.reveal_empty(row, col)
+            button.configure(text=self.board.check_value(tile=cell))
 
     def reveal_empty(self, row, col):
-        if 0 <= row < self.rows and 0 <= col < self.cols and (row, col) not in self.disabled_buttons:
-            self.disabled_buttons.add((row, col))
-            self.buttons[row][col].configure(text=str(self.board[row][col]))
-            if self.board[row][col] == 0:
-                for r in range(row - 1, row + 2):
-                    for c in range(col - 1, col + 2):
-                        self.reveal_empty(r, c)
+        self.board.check_value(tile=self.board.get_cell_by_axis(x=row, y=col))
 
-    def mark_flag(self, row, col, event):
-        if (row, col) not in self.disabled_buttons:
-            if (row, col) in self.flags:
-                self.flags.remove((row, col))
-                self.update_button_text(row, col)
-            else:
-                self.flags.add((row, col))
-                self.buttons[row][col].configure(text="F")
-    def update_button_text(self, row, col):
-        if self.board[row][col] == -1:
-            self.buttons[row][col].configure(text="*" if (row, col) not in self.flags else "")
-        else:
-            self.buttons[row][col].configure(text=str(self.board[row][col]) if (row, col) not in self.flags else "F")
+
+    # def click_tile(self, row, col):
+    #     cell = self.board.get_cell_by_axis(x=row, y=col)
+    #     if cell.value == -1:
+    #         messagebox.showinfo("Game Over", "Trafiłeś na minę. Przegrałeś!")
+    #         self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
+    #     else:
+    #         self.reveal_empty(row, col)
+    #
+    # def reveal_empty(self, row, col):
+    #     self.board.check_value(tile=self.board.get_cell_by_axis(x=row, y=col))
+    #
+    #     pass
+
+    #
+    # def reveal_empty(self, row, col):
+    #     if 0 <= row < self.rows and 0 <= col < self.cols and (row, col) not in self.disabled_buttons:
+    #         self.disabled_buttons.add((row, col))
+    #         self.buttons[row][col].configure(text=str(self.board[row][col]))
+    #         if self.board[row][col] == 0:
+    #             for r in range(row - 1, row + 2):
+    #                 for c in range(col - 1, col + 2):
+    #                     self.reveal_empty(r, c)
+    #
+    # def mark_flag(self, row, col, event):
+    #     if (row, col) not in self.disabled_buttons:
+    #         if (row, col) in self.flags:
+    #             self.flags.remove((row, col))
+    #             self.update_button_text(row, col)
+    #         else:
+    #             self.flags.add((row, col))
+    #             self.buttons[row][col].configure(text="F")
+    # def update_button_text(self, row, col):
+    #     if self.board[row][col] == -1:
+    #         self.buttons[row][col].configure(text="*" if (row, col) not in self.flags else "")
+    #     else:
+    #         self.buttons[row][col].configure(text=str(self.board[row][col]) if (row, col) not in self.flags else "F")
 
     def update_time(self):
         current_time = int(time.time() - self.start_time)
