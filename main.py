@@ -21,6 +21,8 @@ class Window:
         self.master.resizable(False, False)
         self.master.bind("<Escape>", self.confirm_exit)
 
+        self.is_testing = True
+
         # Font settings
         self.font_family = "Arial"
         self.font_family_sec = "Bauhaus 93"
@@ -175,6 +177,9 @@ class Window:
 
         user_exist = self.db.check_user(username=username, password=password)
 
+        if self.is_testing:
+            user_exist = self.db.check_user(username="admin", password="admin")
+
         if user_exist:
             self.login_user(user=user_exist)
         else:
@@ -309,21 +314,24 @@ class Window:
 
                 cell = self.board.get_cell_by_axis(x=row, y=col)
                 if cell.value == -1:
-                    button.configure(fg_color="red", text="")
+                    button.configure(fg_color="red", text=cell.value)
                 else:
-                    button.configure(text="")
+                    button.configure(text=cell.value)
 
                 button.bind("<Button-1>", lambda event, row=row, col=col, button=button: self.click_tile(row, col, button))
                 # button.bind("<Button-3>", lambda event, row=row, col=col: self.mark_flag(row, col, event))
 
     def click_tile(self, row, col, button):
         cell = self.board.get_cell_by_axis(x=row, y=col)
-        self.board.check_value(cell)
 
         if cell.value == -1:
             messagebox.showinfo("Game Over", "Trafiłeś na minę. Przegrałeś!")
             self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
         else:
+            self.board.check_value(cell)
+            if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
+                messagebox.showinfo("You won", "Wygrałeś!")
+                self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
             print(f"Row: {row}, Col: {col}, Value: {cell.value}")
             self.reveal_empty(row, col)
             button.configure(text=self.board.check_value(tile=cell))

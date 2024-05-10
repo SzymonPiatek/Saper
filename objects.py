@@ -17,6 +17,7 @@ class Board:
         self.rows = rows
         self.cols = cols
         self.tiles = self.rows * self.cols
+        self.tiles_revealed = 0
         self.mines = mines
         self.mines_placed = 0
         self.mines_revealed = 0
