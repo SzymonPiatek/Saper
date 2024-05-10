@@ -323,6 +323,10 @@ class Window:
                 button = ctk.CTkButton(self.board_frame, text=" ", fg_color=self.tile_color)
                 button.grid(row=row, column=col, padx=1, pady=1, sticky="nsew")
 
+                if self.is_testing:
+                    cell = self.board.get_cell_by_axis(x=row, y=col)
+                    button.configure(text=cell.value)
+
                 button.bind("<Button-1>", lambda event, row=row, col=col, button=button: self.click_tile(row, col, button))
                 button.bind("<Button-3>", lambda event, row=row, col=col, button=button: self.mark_flag(row, col, button))
 
@@ -340,8 +344,7 @@ class Window:
             self.board.check_value(cell)
             button.configure(fg_color=self.tile_revealed_color)
             if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
-                messagebox.showinfo("You won", "Wygrałeś!")
-                self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
+                self.player_win()
             self.reveal_empty(cell)
             button.configure(text=self.board.check_value(tile=cell), state='disabled')
 
@@ -369,8 +372,17 @@ class Window:
                     button.configure(state='normal')
 
             if self.board.flags == self.board.mines_revealed and self.board.mines == self.board.mines_revealed:
-                messagebox.showinfo("You won", "Wygrałeś!")
-                self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
+                self.player_win()
+
+    def player_win(self):
+        self.db.insert_score(user_id=self.session.user_id,
+                             difficulty_level=self.difficulty,
+                             score=self.get_time())
+        messagebox.showinfo("You won", "Wygrałeś!")
+        self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
+
+    def get_time(self):
+        return int(time.time() - self.start_time)
 
     def update_time(self):
         current_time = int(time.time() - self.start_time)

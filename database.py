@@ -66,6 +66,24 @@ class Database:
             if conn:
                 conn.close()
 
+    def insert_score(self, user_id, difficulty_level, score):
+        try:
+            conn = sqlite3.connect(self.db_name)
+            cursor = conn.cursor()
+
+            cursor.execute(
+                '''
+                INSERT INTO scores (user_id, difficulty_level, score)
+                VALUES (?, ?, ?)
+                ''', (user_id, difficulty_level, score)
+            )
+            conn.commit()
+        except sqlite3.Error as e:
+            print(e)
+        finally:
+            if conn:
+                conn.close()
+
     def check_user(self, username, password):
         try:
             conn = sqlite3.connect(self.db_name)
