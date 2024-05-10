@@ -352,6 +352,9 @@ class Window:
 
         if not cell.is_flagged:
             cell.is_flagged = True
+            self.board.flags += 1
+            if cell.value == -1:
+                self.board.mines_revealed += 1
             button.configure(text="F", state='disabled')
         else:
             cell.is_flagged = False
@@ -359,6 +362,10 @@ class Window:
                 button.configure(text=cell.value, state='normal')
             else:
                 button.configure(text="", state='normal')
+
+        if self.board.flags == self.board.mines_revealed and self.board.mines == self.board.mines_revealed:
+            messagebox.showinfo("You won", "Wygrałeś!")
+            self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
 
     # def mark_flag(self, row, col, event):
     #     if (row, col) not in self.disabled_buttons:
