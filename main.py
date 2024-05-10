@@ -178,6 +178,32 @@ class Window:
         else:
             messagebox.showinfo("Informacja", "Nie istnieje")
 
+    def main_menu(self):
+        # Main Menu Frame
+        self.main_menu_frame = ctk.CTkFrame(self.main_frame)
+        self.main_menu_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Main Menu Widgets
+        title_label = ctk.CTkLabel(self.main_menu_frame, text="Saper")
+        new_game_button = ctk.CTkButton(self.main_menu_frame, text="Nowa gra", corner_radius=20,
+                                        command=lambda: self.change_frame(old=self.main_menu_frame,
+                                                                          new_func=self.level_selection))
+        scoreboard_button = ctk.CTkButton(self.main_menu_frame, text="Sala chwały", corner_radius=20)
+        exit_button = ctk.CTkButton(self.main_menu_frame, text="Wyjście", corner_radius=20,
+                                    command=self.confirm_exit)
+        login_label = ctk.CTkLabel(self.main_menu_frame, text=self.session.user_username)
+
+        # Configure Widgets
+        self.set_font(frame=self.main_menu_frame)
+        title_label.configure(font=self.bigger_font)
+
+        # Main Menu Widgets Placing
+        login_label.place(relx=0.99, rely=0.01, anchor="ne")
+        title_label.place(relx=0.5, rely=0.25, anchor="center")
+        new_game_button.place(relx=0.5, rely=0.55, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        scoreboard_button.place(relx=0.5, rely=0.7, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+        exit_button.place(relx=0.5, rely=0.85, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+
     def level_selection(self):
         # Level Frame
         self.level_frame = ctk.CTkFrame(self.main_frame)
@@ -205,6 +231,7 @@ class Window:
 
     def start_game(self, difficulty):
         self.difficulty = difficulty
+
         if self.difficulty == 0:
             self.rows = 9
             self.cols = 9
@@ -227,36 +254,9 @@ class Window:
 
         self.change_frame(old=self.level_frame, new_func=self.new_game)
 
-    def main_menu(self):
-        # Main Menu Frame
-        self.main_menu_frame = ctk.CTkFrame(self.main_frame)
-        self.main_menu_frame.pack(fill=tk.BOTH, expand=True)
-
-        # Main Menu Widgets
-        title_label = ctk.CTkLabel(self.main_menu_frame, text="Saper")
-        new_game_button = ctk.CTkButton(self.main_menu_frame, text="Nowa gra", corner_radius=20,
-                                        command=lambda: self.change_frame(old=self.main_menu_frame,
-                                                                          new_func=self.level_selection))
-        scoreboard_button = ctk.CTkButton(self.main_menu_frame, text="Sala chwały", corner_radius=20)
-        exit_button = ctk.CTkButton(self.main_menu_frame, text="Wyjście", corner_radius=20,
-                                    command=self.confirm_exit)
-        login_label = ctk.CTkLabel(self.main_menu_frame, text=self.session.user_username)
-
-        # Configure Widgets
-        self.set_font(frame=self.main_menu_frame)
-        title_label.configure(font=self.bigger_font)
-
-        # Main Menu Widgets Placing
-        login_label.place(relx=0.99, rely=0.01, anchor="ne")
-        title_label.place(relx=0.5, rely=0.25, anchor="center")
-        new_game_button.place(relx=0.5, rely=0.55, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
-        scoreboard_button.place(relx=0.5, rely=0.7, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
-        exit_button.place(relx=0.5, rely=0.85, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
-
     def new_game(self):
         if hasattr(self, "main_game_frame"):
             self.main_game_frame.destroy()
-            print("istnieje")
 
         # Main Game Frame
         self.main_game_frame = ctk.CTkFrame(self.main_frame)
@@ -265,6 +265,8 @@ class Window:
         # Main Game Widgets
         self.time_label = ctk.CTkLabel(master=self.main_game_frame,
                                        text="00:00")
+        self.count_mines_label = ctk.CTkLabel(master=self.main_game_frame,
+                                              text=self.mines)
         back_button = ctk.CTkButton(self.main_game_frame, text="Powrót do menu", corner_radius=20,
                                     command=lambda: self.change_frame(old=self.main_game_frame,
                                                                       new_func=self.main_menu))
@@ -273,7 +275,8 @@ class Window:
         self.set_font(frame=self.main_game_frame)
 
         # Main Game Widgets Placing
-        self.time_label.place(relx=0.5, rely=0.05, relheight=0.1, anchor="center")
+        self.time_label.place(relx=0.6, rely=0.05, relheight=0.1, anchor="center")
+        self.count_mines_label.place(relx=0.4, rely=0.05, relheight=0.1, anchor="center")
         back_button.place(relx=0.5, rely=0.9, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
 
         # Board Frame
