@@ -157,14 +157,14 @@ class Window:
         user_exist = self.db.check_user(username=username, password=password)
 
         if user_exist:
-            print("Taki użytkownik już istnieje")
+            messagebox.showinfo("Informacja", "Taki użytkownik już istnieje")
         else:
             user = self.db.create_user(username=username, password=password)
             self.login_user(user=user)
 
     def login_user(self, user):
         self.session.login(user)
-        print(f"Zalogowano jako: {self.session.user_username}")
+        messagebox.showinfo("Informacja", f"Zalogowano jako: {self.session.user_username}")
         self.change_frame(old=self.login_menu_frame, new_func=self.main_menu)
 
     def login_submit(self):
@@ -176,7 +176,7 @@ class Window:
         if user_exist:
             self.login_user(user=user_exist)
         else:
-            print("nie istnieje")
+            messagebox.showinfo("Informacja", "Nie istnieje")
 
     def level_selection(self):
         # Level Frame
@@ -254,6 +254,10 @@ class Window:
         exit_button.place(relx=0.5, rely=0.85, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
 
     def new_game(self):
+        if hasattr(self, "main_game_frame"):
+            self.main_game_frame.destroy()
+            print("istnieje")
+
         # Main Game Frame
         self.main_game_frame = ctk.CTkFrame(self.main_frame)
         self.main_game_frame.pack(fill=tk.BOTH, expand=True)
@@ -319,7 +323,7 @@ class Window:
     def click_tile(self, row, col):
         if (row, col) not in self.flags:
             if self.board[row][col] == -1:
-                messagebox.showinfo("Game Over", "You clicked on a mine! Game Over.")
+                messagebox.showinfo("Game Over", "Trafiłeś na minę. Przegrałeś!")
                 self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
             else:
                 self.reveal_empty(row, col)
@@ -349,10 +353,8 @@ class Window:
 
     def update_time(self):
         current_time = int(time.time() - self.start_time)
-        minutes = current_time // 60
-        seconds = current_time % 60
 
-        time_str = "{:02d}:{:02d}".format(minutes, seconds)
+        time_str = "{:02d}".format(current_time)
 
         self.time_label.configure(text=time_str)
         self.time_label.after(1000, self.update_time)
