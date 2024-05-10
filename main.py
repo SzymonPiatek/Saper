@@ -358,6 +358,9 @@ class Window:
             button.configure(text="F", state='disabled')
         else:
             cell.is_flagged = False
+            self.board.flags -= 1
+            if cell.value == -1:
+                self.board.mines_revealed -= 1
             if cell.is_revealed:
                 button.configure(text=cell.value, state='normal')
             else:
