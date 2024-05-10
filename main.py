@@ -57,6 +57,12 @@ class Window:
         self.relwidth = 0.35
         self.relheight = 0.075
 
+        # Colors
+        self.tile_color = "#2c6cab"
+        self.tile_flagged_color = "#2cab5b"
+        self.tile_mine_color = "#b80000"
+        self.tile_revealed_color = "#6d7073"
+
         # Main Frame
         self.main_frame = ctk.CTkFrame(self.master)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
@@ -314,14 +320,8 @@ class Window:
             for col in range(0, self.board.cols):
                 self.board_frame.grid_columnconfigure(col, weight=1)
 
-                button = ctk.CTkButton(self.board_frame)
+                button = ctk.CTkButton(self.board_frame, text=" ", fg_color=self.tile_color)
                 button.grid(row=row, column=col, padx=1, pady=1, sticky="nsew")
-
-                cell = self.board.get_cell_by_axis(x=row, y=col)
-                if cell.value == -1:
-                    button.configure(fg_color="red", text="")
-                else:
-                    button.configure(text="")
 
                 button.bind("<Button-1>", lambda event, row=row, col=col, button=button: self.click_tile(row, col, button))
                 button.bind("<Button-3>", lambda event, row=row, col=col, button=button: self.mark_flag(row, col, button))
@@ -333,10 +333,12 @@ class Window:
         cell = self.board.get_cell_by_axis(x=row, y=col)
 
         if cell.value == -1:
+            button.configure(fg_color=self.tile_mine_color)
             messagebox.showinfo("Game Over", "Trafiłeś na minę. Przegrałeś!")
             self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
         else:
             self.board.check_value(cell)
+            button.configure(fg_color=self.tile_revealed_color)
             if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                 messagebox.showinfo("You won", "Wygrałeś!")
                 self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
@@ -350,39 +352,25 @@ class Window:
     def mark_flag(self, row, col, button):
         cell = self.board.get_cell_by_axis(x=row, y=col)
 
-        if not cell.is_flagged:
-            cell.is_flagged = True
-            self.board.flags += 1
-            if cell.value == -1:
-                self.board.mines_revealed += 1
-            button.configure(text="F", state='disabled')
-        else:
-            cell.is_flagged = False
-            self.board.flags -= 1
-            if cell.value == -1:
-                self.board.mines_revealed -= 1
-            if cell.is_revealed:
-                button.configure(text=cell.value, state='normal')
+        if not cell.is_revealed:
+            if not cell.is_flagged:
+                button.configure(fg_color=self.tile_flagged_color)
+                cell.is_flagged = True
+                self.board.flags += 1
+                if cell.value == -1:
+                    self.board.mines_revealed += 1
+                button.configure(state='disabled')
             else:
-                button.configure(text="", state='normal')
+                button.configure(fg_color=self.tile_color)
+                cell.is_flagged = False
+                self.board.flags -= 1
+                if cell.value == -1:
+                    self.board.mines_revealed -= 1
+                    button.configure(state='normal')
 
-        if self.board.flags == self.board.mines_revealed and self.board.mines == self.board.mines_revealed:
-            messagebox.showinfo("You won", "Wygrałeś!")
-            self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
-
-    # def mark_flag(self, row, col, event):
-    #     if (row, col) not in self.disabled_buttons:
-    #         if (row, col) in self.flags:
-    #             self.flags.remove((row, col))
-    #             self.update_button_text(row, col)
-    #         else:
-    #             self.flags.add((row, col))
-    #             self.buttons[row][col].configure(text="F")
-    # def update_button_text(self, row, col):
-    #     if self.board[row][col] == -1:
-    #         self.buttons[row][col].configure(text="*" if (row, col) not in self.flags else "")
-    #     else:
-    #         self.buttons[row][col].configure(text=str(self.board[row][col]) if (row, col) not in self.flags else "F")
+            if self.board.flags == self.board.mines_revealed and self.board.mines == self.board.mines_revealed:
+                messagebox.showinfo("You won", "Wygrałeś!")
+                self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
 
     def update_time(self):
         current_time = int(time.time() - self.start_time)
