@@ -53,15 +53,20 @@ class Board:
         tile.value = counter
         return counter
 
+    def check_tiles_revealed(self, tile):
+        if not tile.is_opened:
+            tile.is_opened = True
+            self.tiles_revealed += 1
+
     def generate_board(self):
-        for row in range(0, self.rows - 1):
-            for col in range(0, self.cols - 1):
+        for row in range(0, self.rows):
+            for col in range(0, self.cols):
                 tile = Tile(col=col, row=row, value=0)
                 self.board.append(tile)
 
         while self.mines_placed != self.mines:
-            random_row = randint(0, self.rows - 1)
-            random_col = randint(0, self.cols - 1)
+            random_row = randint(0, self.rows)
+            random_col = randint(0, self.cols)
 
             for cell in self.board:
                 if cell.col == random_col and cell.row == random_row and cell.value != -1:

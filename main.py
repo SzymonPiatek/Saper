@@ -304,9 +304,10 @@ class Window:
         self.board.generate_board()
 
         self.buttons = []
-        for row in range(self.board.rows - 1):
+
+        for row in range(0, self.board.rows):
             self.board_frame.grid_rowconfigure(row, weight=1)
-            for col in range(self.board.cols - 1):
+            for col in range(0, self.board.cols):
                 self.board_frame.grid_columnconfigure(col, weight=1)
 
                 button = ctk.CTkButton(self.board_frame)
@@ -314,9 +315,9 @@ class Window:
 
                 cell = self.board.get_cell_by_axis(x=row, y=col)
                 if cell.value == -1:
-                    button.configure(fg_color="red", text=cell.value)
+                    button.configure(fg_color="red", text="")
                 else:
-                    button.configure(text=cell.value)
+                    button.configure(text="")
 
                 button.bind("<Button-1>", lambda event, row=row, col=col, button=button: self.click_tile(row, col, button))
                 # button.bind("<Button-3>", lambda event, row=row, col=col: self.mark_flag(row, col, event))
@@ -332,13 +333,14 @@ class Window:
             if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                 messagebox.showinfo("You won", "Wygrałeś!")
                 self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
-            print(f"Row: {row}, Col: {col}, Value: {cell.value}")
             self.reveal_empty(row, col)
+            print(f"TR: {self.board.tiles_revealed}, T: {self.board.tiles}, M: {self.board.mines}")
             button.configure(text=self.board.check_value(tile=cell))
 
     def reveal_empty(self, row, col):
-        self.board.check_value(tile=self.board.get_cell_by_axis(x=row, y=col))
-
+        tile = self.board.get_cell_by_axis(x=row, y=col)
+        self.board.check_value(tile=tile)
+        self.board.check_tiles_revealed(tile=tile)
 
     # def click_tile(self, row, col):
     #     cell = self.board.get_cell_by_axis(x=row, y=col)
