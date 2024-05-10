@@ -49,6 +49,7 @@ class Board:
             if cell.value == -1:
                 counter += 1
 
+        tile.value = counter
         return counter
 
     def generate_board(self):

@@ -311,18 +311,20 @@ class Window:
                 if cell.value == -1:
                     button.configure(fg_color="red", text="")
                 else:
-                    button.configure(text=cell.value)
+                    button.configure(text="")
 
                 button.bind("<Button-1>", lambda event, row=row, col=col, button=button: self.click_tile(row, col, button))
                 # button.bind("<Button-3>", lambda event, row=row, col=col: self.mark_flag(row, col, event))
 
     def click_tile(self, row, col, button):
-        print(f"Row: {row}, Col: {col}")
         cell = self.board.get_cell_by_axis(x=row, y=col)
+        self.board.check_value(cell)
+
         if cell.value == -1:
             messagebox.showinfo("Game Over", "Trafiłeś na minę. Przegrałeś!")
             self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
         else:
+            print(f"Row: {row}, Col: {col}, Value: {cell.value}")
             self.reveal_empty(row, col)
             button.configure(text=self.board.check_value(tile=cell))
 
