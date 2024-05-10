@@ -7,7 +7,7 @@ class Tile:
         self.col = col
         self.row = row
         self.is_flaged = False
-        self.is_opened = False
+        self.is_revealed = False
         self.value = value
 
 
@@ -54,8 +54,8 @@ class Board:
         return counter
 
     def check_tiles_revealed(self, tile):
-        if not tile.is_opened:
-            tile.is_opened = True
+        if not tile.is_revealed:
+            tile.is_revealed = True
             self.tiles_revealed += 1
 
     def generate_board(self):

@@ -16,8 +16,12 @@ class Window:
 
         self.get_window_size()
 
-        # self.master.geometry(f"{self.width}x{self.height}+{self.center_width}+{self.center_height}")
-        self.master.geometry("1280x720")
+        self.fullscreen_mode = True
+
+        if self.fullscreen_mode:
+            self.master.attributes("-fullscreen", True)
+        else:
+            self.master.geometry(f"{self.width}x{self.height}+{self.center_width}+{self.center_height}")
         self.master.resizable(False, False)
         self.master.bind("<Escape>", self.confirm_exit)
 
@@ -61,8 +65,8 @@ class Window:
         self.login_menu()
 
     def get_window_size(self):
-        self.screen_width = self.master.winfo_screenwidth()
-        self.screen_height = self.master.winfo_screenheight()
+        self.screen_width = self.master.winfo_screenwidth() - 100
+        self.screen_height = self.master.winfo_screenheight() - 100
 
         if self.screen_width > 1920:
             self.width = 1920
@@ -337,7 +341,6 @@ class Window:
                 messagebox.showinfo("You won", "Wygrałeś!")
                 self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
             self.reveal_empty(row, col)
-            print(f"TR: {self.board.tiles_revealed}, T: {self.board.tiles}, M: {self.board.mines}")
             button.configure(text=self.board.check_value(tile=cell), state='disabled')
 
     def reveal_empty(self, row, col):
