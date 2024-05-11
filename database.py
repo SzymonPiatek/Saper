@@ -103,12 +103,12 @@ class Database:
             if conn:
                 conn.close()
 
-    def get_scores(self, amount, player=False, difficulty_level=0):
+    def get_scores(self, amount, user_id=False, difficulty_level=0):
         try:
             conn = sqlite3.connect(self.db_name)
             cursor = conn.cursor()
 
-            if not player:
+            if not user_id:
                 cursor.execute(
                     '''
                     SELECT * FROM scores 
@@ -124,7 +124,7 @@ class Database:
                     WHERE difficulty_level=? AND user_id=?
                     ORDER BY score ASC
                     LIMIT ?
-                    ''', (difficulty_level, player, amount,)
+                    ''', (difficulty_level, user_id, amount,)
                 )
             scores = cursor.fetchall()
             return scores
@@ -133,8 +133,6 @@ class Database:
         finally:
             if conn:
                 conn.close()
-
-
 
     def check_user(self, username, password):
         try:
