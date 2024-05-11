@@ -69,7 +69,7 @@ class Board:
             random_row = randint(0, self.rows - 1)
             random_col = randint(0, self.cols - 1)
 
-            cell = self.get_cell_by_axis(x=random_row, y=random_col)
+            cell = self.get_cell_by_axis(x=random_col, y=random_row)
             if cell.value != -1:
                 cell.value = -1
                 self.mines_placed += 1

@@ -408,7 +408,7 @@ class Window:
                 button.grid(row=row, column=col, padx=1, pady=1, sticky="nsew")
 
                 if self.is_testing:
-                    cell = self.board.get_cell_by_axis(x=row, y=col)
+                    cell = self.board.get_cell_by_axis(x=col, y=row)
                     button.configure(text=cell.value)
 
                 button.bind("<Button-1>", lambda event, row=row, col=col, button=button: self.click_tile(row, col, button))
@@ -418,7 +418,7 @@ class Window:
         if button.cget('state') == 'disabled':
             return
 
-        cell = self.board.get_cell_by_axis(x=row, y=col)
+        cell = self.board.get_cell_by_axis(x=col, y=row)
 
         if cell.value == -1:
             button.configure(fg_color=self.tile_mine_color)
@@ -436,7 +436,7 @@ class Window:
         self.board.check_tiles_revealed(tile=cell)
 
     def mark_flag(self, row, col, button):
-        cell = self.board.get_cell_by_axis(x=row, y=col)
+        cell = self.board.get_cell_by_axis(x=col, y=row)
 
         if self.board.flags_left <= 0 and not cell.is_flagged:
             return
