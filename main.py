@@ -369,7 +369,9 @@ class Window:
                 self.board.flags -= 1
                 if cell.value == -1:
                     self.board.mines_revealed -= 1
-                    button.configure(state='normal')
+
+            if not cell.is_flagged:
+                button.configure(state='normal')
 
             if self.board.flags == self.board.mines_revealed and self.board.mines == self.board.mines_revealed:
                 self.player_win()
