@@ -257,6 +257,7 @@ class Window:
 
         # Start
         self.scores = self.show_scoreboard()
+        self.own_scores = self.show_scoreboard(player=self.session.user_id)
         self.scores_in_scoreboard()
 
     def update_scoreboard(self):
@@ -271,24 +272,35 @@ class Window:
             self.difficulty_button.configure(text="Poziom łatwy")
 
         self.scores = self.show_scoreboard()
+        self.own_scores = self.show_scoreboard(player=self.session.user_id)
         self.scores_in_scoreboard()
+
+    def insert_scores(self, scores, scoreboard):
+        for index, score in enumerate(scores):
+            user = self.db.get_user_by_id(score[1])
+            username = user[1]
+            score_int = score[3]
+            scoreboard.insert(
+                tk.END,
+                f"{index + 1}. {username}: {score_int}"
+            )
 
     def scores_in_scoreboard(self):
         self.scoreboard_list.delete(0, tk.END)
         if self.scores:
-            for index, score in enumerate(self.scores):
-                user = self.db.get_user_by_id(score[0])
-                username = user[1]
-                score_int = score[3]
-                self.scoreboard_list.insert(
-                    tk.END,
-                    f"{index+1}. {username}: {score_int}"
-                )
+            self.insert_scores(self.scores, self.scoreboard_list)
         else:
             self.scoreboard_list.insert(tk.END, "Brak wyników")
 
+        self.scoreboard_player_list.delete(0, tk.END)
+        if self.own_scores:
+            pass
+            self.insert_scores(self.own_scores, self.scoreboard_player_list)
+        else:
+            self.scoreboard_player_list.insert(tk.END, "Brak wyników")
+
     def show_scoreboard(self, player=False):
-        return self.db.get_scores(amount=10, player=player, difficulty_level=self.scoreboard_difficulty)
+        return self.db.get_scores(amount=10, user_id=player, difficulty_level=self.scoreboard_difficulty)
 
     def level_selection(self):
         # Level Frame
