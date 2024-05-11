@@ -22,6 +22,7 @@ class Board:
         self.mines_placed = 0
         self.mines_revealed = 0
         self.flags = 0
+        self.flags_left = self.mines
 
     def get_cell_by_axis(self, x, y):
         for cell in self.board:
