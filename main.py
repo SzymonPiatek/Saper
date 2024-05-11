@@ -15,9 +15,7 @@ class Window:
         self.master.title("Saper")
 
         self.get_window_size()
-
         self.fullscreen_mode = True
-
         if self.fullscreen_mode:
             self.master.attributes("-fullscreen", True)
         else:
@@ -25,6 +23,7 @@ class Window:
         self.master.resizable(False, False)
         self.master.bind("<Escape>", self.confirm_exit)
 
+        # Tester mode
         self.is_testing = True
 
         # Font settings
@@ -174,6 +173,7 @@ class Window:
             messagebox.showinfo("Informacja", "Taki użytkownik już istnieje")
         else:
             user = self.db.create_user(username=username, password=password)
+            messagebox.showinfo("Informacja", "Stworzono użytkownika")
             self.login_user(user=user)
 
     def login_user(self, user):
@@ -364,14 +364,11 @@ class Window:
                     self.board.mines_revealed += 1
                 button.configure(state='disabled')
             else:
-                button.configure(fg_color=self.tile_color)
+                button.configure(fg_color=self.tile_color, state='normal')
                 cell.is_flagged = False
                 self.board.flags -= 1
                 if cell.value == -1:
                     self.board.mines_revealed -= 1
-
-            if not cell.is_flagged:
-                button.configure(state='normal')
 
             if self.board.flags == self.board.mines_revealed and self.board.mines == self.board.mines_revealed:
                 self.player_win()
