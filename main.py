@@ -235,11 +235,25 @@ class Window:
         self.difficulty_button = ctk.CTkButton(master=self.scoreboard_menu_frame,
                                                text="Poziom łatwy",
                                                command=self.update_scoreboard)
+        self.scoreboard_label = ctk.CTkLabel(master=self.scoreboard_menu_frame,
+                                             text="Wszystkie")
         self.scoreboard_list = tk.Listbox(master=self.scoreboard_menu_frame)
+        self.scoreboard_player_label = ctk.CTkLabel(master=self.scoreboard_menu_frame, text="Własne")
+        self.scoreboard_player_list = tk.Listbox(master=self.scoreboard_menu_frame)
+        back_button = ctk.CTkButton(master=self.scoreboard_menu_frame, text="Powrót do menu", corner_radius=20,
+                                    command=lambda: self.change_frame(old=self.scoreboard_menu_frame,
+                                                                      new_func=self.main_menu))
+
+        # Configure Widgets
+        self.set_font(frame=self.scoreboard_menu_frame)
 
         # Widgets placing
-        self.difficulty_button.pack()
-        self.scoreboard_list.pack()
+        self.difficulty_button.place(relx=0.5, rely=0.05, relwidth=self.relwidth, relheight=self.relheight, anchor="n")
+        self.scoreboard_label.place(relx=0.25, rely=0.2, anchor="n")
+        self.scoreboard_list.place(relx=0.25, rely=0.25, relwidth=self.relwidth, relheight=0.5, anchor="n")
+        self.scoreboard_player_label.place(relx=0.75, rely=0.2, anchor="n")
+        self.scoreboard_player_list.place(relx=0.75, rely=0.25, relwidth=self.relwidth, relheight=0.5, anchor="n")
+        back_button.place(relx=0.5, rely=0.9, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
 
         # Start
         self.scores = self.show_scoreboard()
@@ -261,14 +275,18 @@ class Window:
 
     def scores_in_scoreboard(self):
         self.scoreboard_list.delete(0, tk.END)
-        for index, score in enumerate(self.scores):
-            user = self.db.get_user_by_id(score[0])
-            username = user[1]
-            score_int = score[3]
-            self.scoreboard_list.insert(
-                tk.END,
-                f"{index+1}. {username}: {score_int}"
-            )
+        if self.scores:
+            for index, score in enumerate(self.scores):
+                user = self.db.get_user_by_id(score[0])
+                username = user[1]
+                score_int = score[3]
+                self.scoreboard_list.insert(
+                    tk.END,
+                    f"{index+1}. {username}: {score_int}"
+                )
+        else:
+            self.scoreboard_list.insert(tk.END, "Brak wyników")
+
     def show_scoreboard(self, player=False):
         return self.db.get_scores(amount=10, player=player, difficulty_level=self.scoreboard_difficulty)
 
@@ -438,10 +456,11 @@ class Window:
         self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
 
     def player_win(self):
+        final_time = self.get_time()
         self.db.insert_score(user_id=self.session.user_id,
                              difficulty_level=self.difficulty,
-                             score=self.get_time())
-        messagebox.showinfo("You won", "Wygrałeś!")
+                             score=final_time)
+        messagebox.showinfo("You won", f"Wygrałeś! Twój czas to: {final_time}")
         self.change_frame(old=self.main_game_frame, new_func=self.main_menu)
 
     def get_time(self):
