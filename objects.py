@@ -66,11 +66,10 @@ class Board:
                 self.board.append(tile)
 
         while self.mines_placed != self.mines:
-            random_row = randint(0, self.rows)
-            random_col = randint(0, self.cols)
+            random_row = randint(0, self.rows - 1)
+            random_col = randint(0, self.cols - 1)
 
-            for cell in self.board:
-                if cell.col == random_col and cell.row == random_row and cell.value != -1:
-                    cell.value = -1
-                    self.mines_placed += 1
-                    break
+            cell = self.get_cell_by_axis(x=random_row, y=random_col)
+            if cell.value != -1:
+                cell.value = -1
+                self.mines_placed += 1
