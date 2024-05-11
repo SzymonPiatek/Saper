@@ -479,7 +479,7 @@ class Window:
         return int(time.time() - self.start_time)
 
     def update_time(self):
-        time_str = "{:02d}".format(self.get_time())
+        time_str = "{:03d}".format(self.get_time())
 
         self.time_label.configure(text=time_str)
         self.time_label.after(1000, self.update_time)
