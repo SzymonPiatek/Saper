@@ -84,6 +84,58 @@ class Database:
             if conn:
                 conn.close()
 
+    def get_user_by_id(self, id=0):
+        try:
+            conn = sqlite3.connect(self.db_name)
+            cursor = conn.cursor()
+
+            cursor.execute(
+                '''
+                SELECT * FROM users 
+                WHERE id=?
+                ''', (id,)
+            )
+            user = cursor.fetchone()
+            return user
+        except sqlite3.Error as e:
+            print(e)
+        finally:
+            if conn:
+                conn.close()
+
+    def get_scores(self, amount, player=False, difficulty_level=0):
+        try:
+            conn = sqlite3.connect(self.db_name)
+            cursor = conn.cursor()
+
+            if not player:
+                cursor.execute(
+                    '''
+                    SELECT * FROM scores 
+                    WHERE difficulty_level=?
+                    ORDER BY score ASC
+                    LIMIT ?
+                    ''', (difficulty_level, amount,)
+                )
+            else:
+                cursor.execute(
+                    '''
+                    SELECT * FROM scores 
+                    WHERE difficulty_level=? AND user_id=?
+                    ORDER BY score ASC
+                    LIMIT ?
+                    ''', (difficulty_level, player, amount,)
+                )
+            scores = cursor.fetchall()
+            return scores
+        except sqlite3.Error as e:
+            print(e)
+        finally:
+            if conn:
+                conn.close()
+
+
+
     def check_user(self, username, password):
         try:
             conn = sqlite3.connect(self.db_name)

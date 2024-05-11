@@ -15,7 +15,7 @@ class Window:
         self.master.title("Saper")
 
         self.get_window_size()
-        self.fullscreen_mode = True
+        self.fullscreen_mode = False
         if self.fullscreen_mode:
             self.master.attributes("-fullscreen", True)
         else:
@@ -70,8 +70,8 @@ class Window:
         self.login_menu()
 
     def get_window_size(self):
-        self.screen_width = self.master.winfo_screenwidth() - 100
-        self.screen_height = self.master.winfo_screenheight() - 100
+        self.screen_width = self.master.winfo_screenwidth() - 300
+        self.screen_height = self.master.winfo_screenheight() - 300
 
         if self.screen_width > 1920:
             self.width = 1920
@@ -205,7 +205,9 @@ class Window:
         new_game_button = ctk.CTkButton(self.main_menu_frame, text="Nowa gra", corner_radius=20,
                                         command=lambda: self.change_frame(old=self.main_menu_frame,
                                                                           new_func=self.level_selection))
-        scoreboard_button = ctk.CTkButton(self.main_menu_frame, text="Sala chwały", corner_radius=20)
+        scoreboard_button = ctk.CTkButton(self.main_menu_frame, text="Sala chwały", corner_radius=20,
+                                          command=lambda: self.change_frame(old=self.main_menu_frame,
+                                                                            new_func=self.scoreboard_menu))
         exit_button = ctk.CTkButton(self.main_menu_frame, text="Wyjście", corner_radius=20,
                                     command=self.confirm_exit)
         login_label = ctk.CTkLabel(self.main_menu_frame, text=self.session.user_username)
@@ -220,6 +222,55 @@ class Window:
         new_game_button.place(relx=0.5, rely=0.55, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
         scoreboard_button.place(relx=0.5, rely=0.7, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
         exit_button.place(relx=0.5, rely=0.85, relwidth=self.relwidth, relheight=self.relheight, anchor="center")
+
+    def scoreboard_menu(self):
+        # Frame
+        self.scoreboard_menu_frame = ctk.CTkFrame(self.main_frame)
+        self.scoreboard_menu_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Variables
+        self.scoreboard_difficulty = 0
+
+        # Widgets
+        self.difficulty_button = ctk.CTkButton(master=self.scoreboard_menu_frame,
+                                               text="Poziom łatwy",
+                                               command=self.update_scoreboard)
+        self.scoreboard_list = tk.Listbox(master=self.scoreboard_menu_frame)
+
+        # Widgets placing
+        self.difficulty_button.pack()
+        self.scoreboard_list.pack()
+
+        # Start
+        self.scores = self.show_scoreboard()
+        self.scores_in_scoreboard()
+
+    def update_scoreboard(self):
+        if self.scoreboard_difficulty == 0:
+            self.scoreboard_difficulty = 1
+            self.difficulty_button.configure(text="Poziom średni")
+        elif self.scoreboard_difficulty == 1:
+            self.scoreboard_difficulty = 2
+            self.difficulty_button.configure(text="Poziom trudny")
+        elif self.scoreboard_difficulty == 2:
+            self.scoreboard_difficulty = 0
+            self.difficulty_button.configure(text="Poziom łatwy")
+
+        self.scores = self.show_scoreboard()
+        self.scores_in_scoreboard()
+
+    def scores_in_scoreboard(self):
+        self.scoreboard_list.delete(0, tk.END)
+        for index, score in enumerate(self.scores):
+            user = self.db.get_user_by_id(score[0])
+            username = user[1]
+            score_int = score[3]
+            self.scoreboard_list.insert(
+                tk.END,
+                f"{index+1}. {username}: {score_int}"
+            )
+    def show_scoreboard(self, player=False):
+        return self.db.get_scores(amount=10, player=player, difficulty_level=self.scoreboard_difficulty)
 
     def level_selection(self):
         # Level Frame
