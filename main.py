@@ -30,19 +30,19 @@ class Window:
         self.font_family = "Arial"
         self.font_family_sec = "Bauhaus 93"
         if 1920 >= self.width > 1600 and 1080 >= self.height > 900:
-            self.main_font = ctk.CTkFont(family=self.font_family, size=36)
+            self.main_font = ctk.CTkFont(family=self.font_family, size=36, weight="bold")
             self.smaller_font = ctk.CTkFont(family=self.font_family, size=32)
             self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=256)
         elif 1600 >= self.width > 1280 and 900 >= self.height > 720:
-            self.main_font = ctk.CTkFont(family=self.font_family, size=32)
+            self.main_font = ctk.CTkFont(family=self.font_family, size=32, weight="bold")
             self.smaller_font = ctk.CTkFont(family=self.font_family, size=28)
             self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=224)
         elif 1280 >= self.width > 960 and 720 >= self.height > 540:
-            self.main_font = ctk.CTkFont(family=self.font_family, size=28)
+            self.main_font = ctk.CTkFont(family=self.font_family, size=28, weight="bold")
             self.smaller_font = ctk.CTkFont(family=self.font_family, size=24)
             self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=208)
         else:
-            self.main_font = ctk.CTkFont(family=self.font_family, size=24)
+            self.main_font = ctk.CTkFont(family=self.font_family, size=24, weight="bold")
             self.smaller_font = ctk.CTkFont(family=self.font_family, size=20)
             self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=196)
 
@@ -476,21 +476,21 @@ class Window:
         self.board.check_value(cell)
         button.configure(fg_color=self.tile_revealed_color)
         if cell.value == 1:
-            button.configure(fg_color=self.color_one)
+            button.configure(text_color_disabled=self.color_one)
         elif cell.value == 2:
-            button.configure(fg_color=self.color_two)
+            button.configure(text_color_disabled=self.color_two)
         elif cell.value == 3:
-            button.configure(fg_color=self.color_three)
+            button.configure(text_color_disabled=self.color_three)
         elif cell.value == 4:
-            button.configure(fg_color=self.color_four)
+            button.configure(text_color_disabled=self.color_four)
         elif cell.value == 5:
-            button.configure(fg_color=self.color_five)
+            button.configure(text_color_disabled=self.color_five)
         elif cell.value == 6:
-            button.configure(fg_color=self.color_six)
+            button.configure(text_color_disabled=self.color_six)
         elif cell.value == 7:
-            button.configure(fg_color=self.color_seven)
+            button.configure(text_color_disabled=self.color_seven)
         elif cell.value == 8:
-            button.configure(fg_color=self.color_eight)
+            button.configure(text_color_disabled=self.color_eight)
 
     def reveal_empty(self, cell):
         self.board.check_value(tile=cell)
