@@ -24,7 +24,7 @@ class Window:
         self.master.bind("<Escape>", self.confirm_exit)
 
         # Tester mode
-        self.is_testing = False
+        self.is_testing = True
 
         # Font settings
         self.font_family = "Arial"
@@ -61,7 +61,7 @@ class Window:
         self.tile_flagged_color = "#2cab5b"
         self.tile_mine_color = "#b80000"
         self.tile_revealed_color = "#6d7073"
-        self.tile_revealed_color_zero = "#bec6cf" # nazwa komendy i kolor może byc do zmiany, dodalem kosmetycznie żeby 0 od innych oddzielało
+        self.tile_revealed_color_zero = "#bec6cf"
 
         # Main Frame
         self.main_frame = ctk.CTkFrame(self.master)
@@ -435,6 +435,7 @@ class Window:
                 if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                     self.player_win()
                 button.configure(text=self.board.check_value(tile=cell), state='disabled')
+            self.board.check_tiles_revealed(cell)
 
     def reveal_zeroes(self, row, col):
         stack = [(row, col)]
@@ -453,10 +454,11 @@ class Window:
                             stack.append((nr, nc))
             button = self.buttons[row * self.cols + col]
             if cell.value == 0:
-                button.configure(fg_color=self.tile_revealed_color_zero) # nazwa komendy i kolor może byc do zmiany, dodalem kosmetycznie żeby 0 od innych oddzielało
+                button.configure(fg_color=self.tile_revealed_color_zero)
             else:
                 button.configure(fg_color=self.tile_revealed_color)
-            self.board.check_value(cell)
+            # self.board.check_value(cell)
+            self.board.check_tiles_revealed(tile=cell)
             if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                 self.player_win()
             button.configure(text=self.board.check_value(tile=cell), state='disabled')
