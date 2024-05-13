@@ -61,7 +61,15 @@ class Window:
         self.tile_flagged_color = "#2cab5b"
         self.tile_mine_color = "#b80000"
         self.tile_revealed_color = "#6d7073"
-        self.tile_revealed_color_zero = "#bec6cf"
+        self.color_zero = "#bec6cf"
+        self.color_one = "#b82c2c"
+        self.color_two = "#b8852c"
+        self.color_three = "#89b82c"
+        self.color_four = "#2c93b8"
+        self.color_five = "#662cb8"
+        self.color_six = "#b85d2c"
+        self.color_seven = "#2c9eb8",
+        self.color_eight = "#b12cb8"
 
         # Main Frame
         self.main_frame = ctk.CTkFrame(self.master)
@@ -417,6 +425,9 @@ class Window:
 
                 self.buttons.append(button)
 
+        for button in self.buttons:
+            button.configure(font=self.main_font, text_color_disabled="#fff")
+
     def click_tile(self, row, col, button):
         if button.cget('state') == 'disabled':
             return
@@ -430,8 +441,7 @@ class Window:
             if cell.value == 0:
                 self.reveal_zeroes(row, col)
             else:
-                button.configure(fg_color=self.tile_revealed_color)
-                self.board.check_value(cell)
+                self.change_color_by_value(cell, button)
                 button.configure(text=self.board.check_value(tile=cell), state='disabled')
                 if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                     self.player_win()
@@ -454,13 +464,33 @@ class Window:
                             stack.append((nr, nc))
             button = self.buttons[row * self.cols + col]
             if cell.value == 0:
-                button.configure(fg_color=self.tile_revealed_color_zero)
+                button.configure(fg_color=self.color_zero)
             else:
-                button.configure(fg_color=self.tile_revealed_color)
+                self.change_color_by_value(cell, button)
             self.board.check_tiles_revealed(tile=cell)
             if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                 self.player_win()
             button.configure(text=self.board.check_value(tile=cell), state='disabled')
+
+    def change_color_by_value(self, cell, button):
+        self.board.check_value(cell)
+        button.configure(fg_color=self.tile_revealed_color)
+        if cell.value == 1:
+            button.configure(fg_color=self.color_one)
+        elif cell.value == 2:
+            button.configure(fg_color=self.color_two)
+        elif cell.value == 3:
+            button.configure(fg_color=self.color_three)
+        elif cell.value == 4:
+            button.configure(fg_color=self.color_four)
+        elif cell.value == 5:
+            button.configure(fg_color=self.color_five)
+        elif cell.value == 6:
+            button.configure(fg_color=self.color_six)
+        elif cell.value == 7:
+            button.configure(fg_color=self.color_seven)
+        elif cell.value == 8:
+            button.configure(fg_color=self.color_eight)
 
     def reveal_empty(self, cell):
         self.board.check_value(tile=cell)
