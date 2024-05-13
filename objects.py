@@ -73,3 +73,15 @@ class Board:
             if cell.value != -1:
                 cell.value = -1
                 self.mines_placed += 1
+
+        for tile in self.board:
+            if tile.value == -1:
+                continue
+            counter = 0
+            for cell in self.surrounded_cells(tile):
+                if cell.value == -1:
+                    counter += 1
+            if counter == 0:
+                tile.value = 0
+            else:
+                tile.value = 1

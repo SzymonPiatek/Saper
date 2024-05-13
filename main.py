@@ -414,6 +414,8 @@ class Window:
                 button.bind("<Button-1>", lambda event, row=row, col=col, button=button: self.click_tile(row, col, button))
                 button.bind("<Button-3>", lambda event, row=row, col=col, button=button: self.mark_flag(row, col, button))
 
+                self.buttons.append(button)
+
     def click_tile(self, row, col, button):
         if button.cget('state') == 'disabled':
             return
@@ -424,11 +426,35 @@ class Window:
             button.configure(fg_color=self.tile_mine_color)
             self.player_lost()
         else:
-            self.board.check_value(cell)
+            if cell.value == 0:
+                self.reveal_zeroes(row, col)
+            else:
+                button.configure(fg_color=self.tile_revealed_color)
+                self.board.check_value(cell)
+                if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
+                    self.player_win()
+                button.configure(text=self.board.check_value(tile=cell), state='disabled')
+
+    def reveal_zeroes(self, row, col):
+        stack = [(row, col)]
+        visited = set(stack)
+
+        while stack:
+            row, col = stack.pop()
+            cell = self.board.get_cell_by_axis(x=col, y=row)
+
+            if cell.value == 0:
+                for dr in [-1, 0, 1]:
+                    for dc in [-1, 0, 1]:
+                        nr, nc = row + dr, col + dc
+                        if 0 <= nr < self.rows and 0 <= nc < self.cols and (nr, nc) not in visited:
+                            visited.add((nr, nc))
+                            stack.append((nr, nc))
+            button = self.buttons[row * self.cols + col]
             button.configure(fg_color=self.tile_revealed_color)
+            self.board.check_value(cell)
             if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                 self.player_win()
-            self.reveal_empty(cell)
             button.configure(text=self.board.check_value(tile=cell), state='disabled')
 
     def reveal_empty(self, cell):
