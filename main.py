@@ -457,7 +457,6 @@ class Window:
                 button.configure(fg_color=self.tile_revealed_color_zero)
             else:
                 button.configure(fg_color=self.tile_revealed_color)
-            # self.board.check_value(cell)
             self.board.check_tiles_revealed(tile=cell)
             if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                 self.player_win()
