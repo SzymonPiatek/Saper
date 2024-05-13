@@ -432,9 +432,9 @@ class Window:
             else:
                 button.configure(fg_color=self.tile_revealed_color)
                 self.board.check_value(cell)
+                button.configure(text=self.board.check_value(tile=cell), state='disabled')
                 if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                     self.player_win()
-                button.configure(text=self.board.check_value(tile=cell), state='disabled')
             self.board.check_tiles_revealed(cell)
 
     def reveal_zeroes(self, row, col):
