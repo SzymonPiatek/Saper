@@ -68,8 +68,8 @@ class Window:
             self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=196)
 
     def get_window_size(self):
-        self.screen_width = self.master.winfo_screenwidth() - 300
-        self.screen_height = self.master.winfo_screenheight() - 300
+        self.screen_width = self.master.winfo_screenwidth() - 100
+        self.screen_height = self.master.winfo_screenheight() - 100
 
         if self.screen_width > 1920:
             self.width = 1920
