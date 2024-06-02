@@ -51,20 +51,20 @@ class Window:
         self.font_family_sec = self.cnfg["font_family"][1]
 
         if 1920 >= self.width > 1600 and 1080 >= self.height > 900:
-            self.main_font = ctk.CTkFont(family=self.font_family, size=36, weight="bold")
-            self.smaller_font = ctk.CTkFont(family=self.font_family, size=32)
-            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=256)
-        elif 1600 >= self.width > 1280 and 900 >= self.height > 720:
             self.main_font = ctk.CTkFont(family=self.font_family, size=32, weight="bold")
             self.smaller_font = ctk.CTkFont(family=self.font_family, size=28)
-            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=224)
-        elif 1280 >= self.width > 960 and 720 >= self.height > 540:
+            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=256)
+        elif 1600 >= self.width > 1280 and 900 >= self.height > 720:
             self.main_font = ctk.CTkFont(family=self.font_family, size=28, weight="bold")
             self.smaller_font = ctk.CTkFont(family=self.font_family, size=24)
-            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=208)
-        else:
+            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=224)
+        elif 1280 >= self.width > 960 and 720 >= self.height > 540:
             self.main_font = ctk.CTkFont(family=self.font_family, size=24, weight="bold")
             self.smaller_font = ctk.CTkFont(family=self.font_family, size=20)
+            self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=208)
+        else:
+            self.main_font = ctk.CTkFont(family=self.font_family, size=20, weight="bold")
+            self.smaller_font = ctk.CTkFont(family=self.font_family, size=16)
             self.bigger_font = ctk.CTkFont(family=self.font_family_sec, size=196)
 
     def get_window_size(self):
@@ -386,7 +386,10 @@ class Window:
             for col in range(0, self.board.cols):
                 self.board_frame.grid_columnconfigure(col, weight=1)
 
-                button = ctk.CTkButton(self.board_frame, text=" ", fg_color=self.cnfg["colors"]["tile"])
+                button = ctk.CTkButton(master=self.board_frame,
+                                       text=" ",
+                                       fg_color=self.cnfg["colors"]["tile"],
+                                       border_width=1)
                 button.grid(row=row, column=col, padx=1, pady=1, sticky="nsew")
 
                 if self.cnfg["test_mode"]:
@@ -408,14 +411,15 @@ class Window:
         cell = self.board.get_cell_by_axis(x=col, y=row)
 
         if cell.value == -1:
-            button.configure(fg_color=self.cnfg["colors"]["tile_mine"])
+            button.configure(text="💣", fg_color=self.cnfg["colors"]["tile_mine"])
             self.player_lost()
         else:
             if cell.value == 0:
                 self.reveal_zeroes(row, col)
             else:
                 self.change_color_by_value(cell, button)
-                button.configure(text=self.board.check_value(tile=cell), state='disabled')
+                value = self.board.check_value(tile=cell)
+                button.configure(text=value if value else "", state="disabled")
                 if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                     self.player_win()
             self.board.check_tiles_revealed(cell)
@@ -443,7 +447,8 @@ class Window:
             self.board.check_tiles_revealed(tile=cell)
             if self.board.tiles_revealed == self.board.tiles - 1 - self.board.mines:
                 self.player_win()
-            button.configure(text=self.board.check_value(tile=cell), state='disabled')
+            value = self.board.check_value(tile=cell)
+            button.configure(text=value if value else "", state="disabled")
 
     def change_color_by_value(self, cell, button):
         self.board.check_value(cell)
@@ -477,7 +482,7 @@ class Window:
 
         if not cell.is_revealed:
             if not cell.is_flagged:
-                button.configure(fg_color=self.cnfg["colors"]["tile_flagged"])
+                button.configure(text="🚩", fg_color=self.cnfg["colors"]["tile_flagged"])
                 cell.is_flagged = True
                 self.board.flags += 1
                 self.board.flags_left -= 1
@@ -485,7 +490,7 @@ class Window:
                     self.board.mines_revealed += 1
                 button.configure(state='disabled')
             else:
-                button.configure(fg_color=self.cnfg["colors"]["tile"], state='normal')
+                button.configure(text="" if not self.cnfg["test_mode"] else cell.value, fg_color=self.cnfg["colors"]["tile"], state='normal')
                 cell.is_flagged = False
                 self.board.flags -= 1
                 self.board.flags_left += 1
